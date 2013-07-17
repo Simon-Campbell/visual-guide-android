@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Blind Assistant</string>
+    <string name="request_assistance">Request Assistance</string>
+    <string name="status_title">Status</string>
+
+    <!-- Voice recognizer status -->
+    <string name="voice_status_none">No status recorded</string>
+    <string name="voice_status_ready">Voice is ready to record</string>
+    <string name="voice_status_error">Voice error %1$s (%2$d)</string>
+    <string name="voice_status_start_talk">Android is now listening for words</string>
+    <string name="voice_status_end_talk">Android has stopped listening for words</string>
+    <string name="voice_status_results">Android has heard the words: %1$s</string>
+
+    <!-- Speech recognizer error descriptions -->
+    <string name="voice_err_audio">An audio recording error occurred</string>
+    <string name="voice_err_client">A client side error occurred</string>
+    <string name="voice_err_insufficient_permissions">This application has insufficient permissions to access your
+        microphone
+    </string>
+    <string name="voice_err_network">A network related error occurred</string>
+    <string name="voice_err_network_timeout">The network request was not completed in time</string>
+    <string name="voice_err_no_match">No recognition result matched</string>
+    <string name="voice_err_recognizer_busy">The recognition service is busy</string>
+    <string name="voice_err_server">The voice recognition server sent an error status</string>
+    <string name="voice_err_speech_timeout">There was no speech input</string>
+    <string name="voice_err_unk">An unknown error has occurred</string>
+</resources>

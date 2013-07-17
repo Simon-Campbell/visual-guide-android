@@ -1,0 +1,21 @@
+kw "take" {
+    kw "me" {
+        kw "to", "too" {
+            vw 0 {
+                kw "near", "by", "on" {
+                    vw 1 {
+                        nav $0, $1
+                    }
+                }
+            }
+        }
+    }
+}
+
+kw "where" {
+    kw "am" {
+        kw "i" {
+            say @LOCATION
+        }
+    }
+}

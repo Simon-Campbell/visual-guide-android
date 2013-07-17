@@ -1,0 +1,7 @@
+"take me to $LOCATION"              nav $LOCATION
+"take me to $LOCATION near $NEAR"   nav $LOCATION $NEAR
+"where am i"                        say @LOCATION
+"where are you taking me?"          say @TARGETLOCATION
+"what country am I in"              say @COUNTRY
+"what city am I in"                 say @CITY
+"what address am I near"            say @ADDRESS

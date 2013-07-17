@@ -1,4 +1,6 @@
-package nz.ac.waikato.ssc10.BlindAssistant;
+package nz.ac.waikato.ssc10.map;
+
+import nz.ac.waikato.ssc10.BlindAssistant.GpsCoordinate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,7 +8,7 @@ import java.util.List;
 /**
  * A class which generates a route for users
  */
-public class GoogleMapRouteGenerator {
+public class AssistedRouteGenerator {
     private GpsCoordinate endPoint;
 
     /**
@@ -15,7 +17,7 @@ public class GoogleMapRouteGenerator {
      *
      * @param endPoint The end point of the route
      */
-    public GoogleMapRouteGenerator(GpsCoordinate endPoint) {
+    public AssistedRouteGenerator(GpsCoordinate endPoint) {
         this.endPoint = endPoint;
     }
 
@@ -43,7 +45,7 @@ public class GoogleMapRouteGenerator {
      * @return A route generator which can route to the
      *         specified place name
      */
-    public static GoogleMapRouteGenerator fromName(String name) {
+    public static AssistedRouteGenerator fromName(String name) {
         throw new UnsupportedOperationException("Not implemented");
     }
 }

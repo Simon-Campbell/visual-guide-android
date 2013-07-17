@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import nz.ac.waikato.ssc10.map.GoogleWalkingDirections;
+import nz.ac.waikato.ssc10.map.WalkingDirections;
 
 import java.util.ArrayList;
 
@@ -36,7 +37,7 @@ public class VoicePromptActivity extends Activity {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
-                GoogleWalkingDirections route = new GoogleWalkingDirections("Hamilton, New Zealand", "Te Awamutu, New Zealand");
+                WalkingDirections route = new GoogleWalkingDirections("Hamilton, New Zealand", "Te Awamutu, New Zealand");
             }
         });
 

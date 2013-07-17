@@ -1,41 +1,29 @@
 package nz.ac.waikato.ssc10.BlindAssistant;
 
+import nz.ac.waikato.ssc10.map.LatLng;
+
 /**
  * A class describing a GPS coordinate in terms of latitude,
  * longitude and altitude
  */
 public class GpsCoordinate {
-    double mLatitude;
-    double mLongitude;
-    double mAltitude;
+    private LatLng location;
+    private double altitude;
 
     public GpsCoordinate(double latitude, double longitude, double altitude) {
-        this.mLatitude = latitude;
-        this.mLongitude = longitude;
-        this.mAltitude = altitude;
+        this.location = new LatLng(latitude, longitude);
+        this.altitude = altitude;
     }
 
     public double getAltitude() {
-        return mAltitude;
-    }
-
-    public void setAltitude(double altitude) {
-        this.mAltitude = altitude;
+        return this.altitude;
     }
 
     public double getLatitude() {
-        return mLatitude;
-    }
-
-    public void setLatitude(double latitude) {
-        this.mLatitude = latitude;
+        return this.location.getLatitude();
     }
 
     public double getLongitude() {
-        return mLongitude;
-    }
-
-    public void setLongitude(double longitude) {
-        this.mLongitude = longitude;
+        return this.location.getLongitude();
     }
 }

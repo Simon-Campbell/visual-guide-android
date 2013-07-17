@@ -23,7 +23,7 @@ import java.util.List;
  * Time: 10:22 PM
  * To change this template use File | Settings | File Templates.
  */
-public class GoogleWalkingDirections {
+public class GoogleWalkingDirections implements WalkingDirections {
     private static final String API_BASE_URL = "http://maps.googleapis.com/maps/api/directions/json";
 
     private static final String API_ORIGIN_PARAM = "origin";    // Required
@@ -90,8 +90,12 @@ public class GoogleWalkingDirections {
     private LatLng endLocation;
     private String startAddress;
     private LatLng startLocation;
-    private ArrayList<MapStep> steps = new ArrayList<MapStep>();
+    private ArrayList<NavigationStep> steps = new ArrayList<NavigationStep>();
     private String copyright = "Map data (c)2013 Google";
+
+    public List<NavigationStep> getSteps() {
+        return steps;
+    }
 
     private void setFromJson(String json) throws
             JSONException,
@@ -111,7 +115,7 @@ public class GoogleWalkingDirections {
             JSONArray steps = primaryLeg.getJSONArray("steps");
 
             int stepCnt = steps.length();
-            ArrayList<MapStep> stepArrayList = new ArrayList<MapStep>(stepCnt);
+            ArrayList<NavigationStep> stepArrayList = new ArrayList<NavigationStep>(stepCnt);
 
             for (int i = 0; i < stepCnt; i++) {
                 stepArrayList.add(getMapStepFromJson(steps.getJSONObject(i)));
@@ -125,7 +129,7 @@ public class GoogleWalkingDirections {
         }
     }
 
-    private static MapStep getMapStepFromJson(JSONObject jsonObject) throws JSONException {
+    private static NavigationStep getMapStepFromJson(JSONObject jsonObject) throws JSONException {
         LatLng startLocation = getLatLngFromJson(jsonObject.getJSONObject("start_location"));
         LatLng endLocation = getLatLngFromJson(jsonObject.getJSONObject("end_location"));
 
@@ -135,7 +139,7 @@ public class GoogleWalkingDirections {
         String instructions = jsonObject.getString("html_instructions");
         String travelMode = jsonObject.getString("travel_mode");
 
-        return new MapStep(distance.getInt("value"), duration.getInt("value"), endLocation, startLocation, instructions, travelMode);
+        return new NavigationStep(distance.getInt("value"), duration.getInt("value"), endLocation, startLocation, instructions, travelMode);
     }
 
     private static LatLng getLatLngFromJson(JSONObject jsonObject) throws JSONException {

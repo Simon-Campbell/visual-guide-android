@@ -31,13 +31,13 @@ stmt:
     (keyword_stmt | set_stmt | nav_stmt | say_stmt);
 
 say_stmt:
-    SAY QMARK? VAR
+    SAY QMARK? VAR # Say;
 
 set_stmt:
-	SET QMARK? USR_VAR EQ SYS_VAR post_keyword_stmt # Set;
+	SET QMARK? USR_VAR EQ SYS_VAR stmt # Set;
 	
 nav_stmt:
-	NAV QMARK? (USR_VAR | QUOTE WORD QUOTE) post_keyword_stmt # Navigate;
+	NAV QMARK? (USR_VAR | QUOTE WORD QUOTE) stmt # Navigate;
 
 comment: HASH (.)*? NL;
 
@@ -53,7 +53,7 @@ EQ: '=';
 USR_VAR: '$' WORD;
 SYS_VAR: '@' ( 'SPEECH' | 'LOCATION' );
 
-VAR: USR_VAR | SYS_VAR
+VAR: USR_VAR | SYS_VAR;
 
 WORD : [A-Za-z]+ ;          // match lower-case identifiers
 TAB	 : '\t';

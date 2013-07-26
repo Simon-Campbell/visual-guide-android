@@ -1,5 +1,8 @@
 package nz.ac.waikato.ssc10.map;
 
+import nz.ac.waikato.ssc10.navigation.NavigationStep;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,9 +17,27 @@ public class DisabilityWalkingDirections extends WalkingDirectionsDecorator {
     @Override
     public List<NavigationStep> getSteps() {
         List<NavigationStep> steps = super.getSteps();
+        List<NavigationStep> aidPoints = getAidPoints();
 
-        // TODO: Add functionality so that map route contains disability information
+        return decorateSteps(steps, aidPoints);
+    }
 
-        return steps;
+    private List<NavigationStep> getAidPoints() {
+        List<NavigationStep> aidPoints = new ArrayList<NavigationStep>();
+        return aidPoints;
+    }
+
+    private List<NavigationStep> decorateSteps(List<NavigationStep> corePath, List<NavigationStep> aidPoints) {
+        for (NavigationStep coreStep : corePath) {
+            List<NavigationStep> aidOnPath = findStepsNearPath(coreStep, aidPoints);
+        }
+
+        return corePath;
+    }
+
+    private List<NavigationStep> findStepsNearPath(NavigationStep step, List<NavigationStep> aidPoints) {
+        List<NavigationStep> nearPath = new ArrayList<NavigationStep>();
+
+        return aidPoints;
     }
 }

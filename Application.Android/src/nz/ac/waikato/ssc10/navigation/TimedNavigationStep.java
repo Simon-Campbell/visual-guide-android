@@ -1,9 +1,11 @@
-package nz.ac.waikato.ssc10.map;
+package nz.ac.waikato.ssc10.navigation;
+
+import nz.ac.waikato.ssc10.map.LatLng;
 
 /**
  * A class which describes a navigation step
  */
-public class NavigationStep {
+public class TimedNavigationStep implements NavigationStep {
     private int distanceValue;
     private int durationValue;
 
@@ -16,7 +18,7 @@ public class NavigationStep {
     private NavigationStep next;
     private NavigationStep previous;
 
-    public NavigationStep(int distanceValue, int durationValue, LatLng endLocation, LatLng startLocation, String instruction, String travelMode) {
+    public TimedNavigationStep(int distanceValue, int durationValue, LatLng endLocation, LatLng startLocation, String instruction, String travelMode) {
         this.distanceValue = distanceValue;
         this.durationValue = durationValue;
         this.endLocation = endLocation;
@@ -25,10 +27,7 @@ public class NavigationStep {
         this.travelMode = travelMode;
     }
 
-    /**
-     * Get the instruction for the map step (based on the previous instruction)
-     * @return The instruction for the map step
-     */
+    @Override
     public String getInstruction() {
         return (instruction.replaceAll("\\<.*?>",""));
     }
@@ -41,11 +40,23 @@ public class NavigationStep {
         this.previous = previous;
     }
 
+    @Override
     public NavigationStep getNext() {
         return this.next;
     }
 
+    @Override
     public NavigationStep getPrevious() {
         return this.previous;
+    }
+
+    @Override
+    public LatLng getStartLocation() {
+        return startLocation;
+    }
+
+    @Override
+    public LatLng getEndLocation() {
+        return endLocation;
     }
 }

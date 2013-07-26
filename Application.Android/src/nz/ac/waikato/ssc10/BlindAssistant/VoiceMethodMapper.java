@@ -26,15 +26,12 @@ import java.util.regex.Pattern;
  * Time: 3:22 PM
  * To change this template use File | Settings | File Templates.
  */
-class VoiceMethodMapper {
+public class VoiceMethodMapper {
     private static final String TAG = "VoiceMethodMapper";
 
     private Map<String, Method> voiceMethods = new HashMap<String, Method>();
 
-    private class PlaceholderComparator implements Comparator<String> {
-        public PlaceholderComparator() {
-        }
-
+    public class PlaceholderComparator implements Comparator<String> {
         @Override
         public int compare(String s, String s2) {
             final Pattern pattern = Pattern.compile("\\{\\d\\}");

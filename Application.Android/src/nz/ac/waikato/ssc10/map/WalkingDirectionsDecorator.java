@@ -1,5 +1,7 @@
 package nz.ac.waikato.ssc10.map;
 
+import nz.ac.waikato.ssc10.navigation.NavigationStep;
+
 import java.util.List;
 
 /**

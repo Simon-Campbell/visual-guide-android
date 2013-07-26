@@ -43,23 +43,14 @@ public class VoiceInputGrammarParserTest {
     }
 
     private class TestTreeWalker implements VoiceInputGrammarListener {
+
         @Override
-        public void enterEnd(VoiceInputGrammarParser.EndContext ctx) {
+        public void enterSay(VoiceInputGrammarParser.SayContext ctx) {
             //To change body of implemented methods use File | Settings | File Templates.
         }
 
         @Override
-        public void exitEnd(VoiceInputGrammarParser.EndContext ctx) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public void enterKeyword(VoiceInputGrammarParser.KeywordContext ctx) {
-            System.out.println("Found a keyword with value: " + ctx.WORD().toString());
-        }
-
-        @Override
-        public void exitKeyword(VoiceInputGrammarParser.KeywordContext ctx) {
+        public void exitSay(VoiceInputGrammarParser.SayContext ctx) {
             //To change body of implemented methods use File | Settings | File Templates.
         }
 
@@ -74,22 +65,32 @@ public class VoiceInputGrammarParserTest {
         }
 
         @Override
-        public void enterStatement(VoiceInputGrammarParser.StatementContext ctx) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public void exitStatement(VoiceInputGrammarParser.StatementContext ctx) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
         public void enterNavigate(VoiceInputGrammarParser.NavigateContext ctx) {
             //To change body of implemented methods use File | Settings | File Templates.
         }
 
         @Override
         public void exitNavigate(VoiceInputGrammarParser.NavigateContext ctx) {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        @Override
+        public void enterStmt(VoiceInputGrammarParser.StmtContext ctx) {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        @Override
+        public void exitStmt(VoiceInputGrammarParser.StmtContext ctx) {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        @Override
+        public void enterKeywordOperation(VoiceInputGrammarParser.KeywordOperationContext ctx) {
+            //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        @Override
+        public void exitKeywordOperation(VoiceInputGrammarParser.KeywordOperationContext ctx) {
             //To change body of implemented methods use File | Settings | File Templates.
         }
 

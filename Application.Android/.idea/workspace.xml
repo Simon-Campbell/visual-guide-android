@@ -21,21 +21,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b6bf1cc6-2723-405b-9bce-7b673a0c158f" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/map/FileBasedAssistanceProvider.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/nz/ac/waikato/ssc10/map/FileBasedAssistanceProviderTest.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/navigation/NavigationStep.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/navigation/PedestrianCrossing.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/assets/assist-locations/assist-locations.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/test/resources/assist-locations.txt" />
-      <change type="MOVED" beforePath="C:\Users\Simon\Development\Vision.Guide\Application.Android\src\nz\ac\waikato\ssc10\map\NavigationStep.java" afterPath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/navigation/TimedNavigationStep.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Application.Android.iml" afterPath="$PROJECT_DIR$/Application.Android.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/map/DisabilityWalkingDirections.java" afterPath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/map/DisabilityWalkingDirections.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/map/GoogleWalkingDirections.java" afterPath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/map/GoogleWalkingDirections.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/map/LatLng.java" afterPath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/map/LatLng.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/BlindAssistant/NavigationGuideUpdateListener.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/grammar/VoiceInputGrammar.tokens" afterPath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/grammar/VoiceInputGrammar.tokens" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/grammar/VoiceInputGrammarBaseListener.java" afterPath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/grammar/VoiceInputGrammarBaseListener.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/grammar/VoiceInputGrammarLexer.java" afterPath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/grammar/VoiceInputGrammarLexer.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/grammar/VoiceInputGrammarLexer.tokens" afterPath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/grammar/VoiceInputGrammarLexer.tokens" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/grammar/VoiceInputGrammarListener.java" afterPath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/grammar/VoiceInputGrammarListener.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/grammar/VoiceInputGrammarParser.java" afterPath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/grammar/VoiceInputGrammarParser.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/nz/ac/waikato/ssc10/grammar/VoiceInputGrammarParserTest.java" afterPath="$PROJECT_DIR$/test/nz/ac/waikato/ssc10/grammar/VoiceInputGrammarParserTest.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/BlindAssistant/VoiceMethodMapper.java" afterPath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/BlindAssistant/VoiceMethodMapper.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/map/WalkingDirections.java" afterPath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/map/WalkingDirections.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/map/WalkingDirectionsDecorator.java" afterPath="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/map/WalkingDirectionsDecorator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="BlindAssistant.iws" />
@@ -253,10 +247,10 @@
     <file path="$APPLICATION_HOME_DIR$/plugins/JavaEE/lib/javaee-impl.jar!/standardSchemas/web-jsptaglibrary_2_0.xsd" changelist="b6bf1cc6-2723-405b-9bce-7b673a0c158f" time="1373334997194" ignored="false" />
     <file path="$APPLICATION_HOME_DIR$/plugins/JavaEE/lib/javaee-impl.jar!/standardSchemas/web-app_2_5.xsd" changelist="b6bf1cc6-2723-405b-9bce-7b673a0c158f" time="1373334997195" ignored="false" />
     <file path="$APPLICATION_HOME_DIR$/plugins/JavaEE/lib/javaee-impl.jar!/standardSchemas/javaee_web_services_client_1_2.xsd" changelist="b6bf1cc6-2723-405b-9bce-7b673a0c158f" time="1373334997195" ignored="false" />
-    <file path="/Dummy.txt" changelist="b6bf1cc6-2723-405b-9bce-7b673a0c158f" time="1374833617611" ignored="false" />
+    <file path="/Dummy.txt" changelist="b6bf1cc6-2723-405b-9bce-7b673a0c158f" time="1374834102008" ignored="false" />
     <file path="$APPLICATION_HOME_DIR$/plugins/android/lib/android.jar!/org/jetbrains/android/android.xsd" changelist="b6bf1cc6-2723-405b-9bce-7b673a0c158f" time="1373335170900" ignored="false" />
     <file path="/VoicePromptActivity.java" changelist="b6bf1cc6-2723-405b-9bce-7b673a0c158f" time="1373361504115" ignored="false" />
-    <file path="/fragment.java" changelist="b6bf1cc6-2723-405b-9bce-7b673a0c158f" time="1374567418324" ignored="false" />
+    <file path="/fragment.java" changelist="b6bf1cc6-2723-405b-9bce-7b673a0c158f" time="1374834105658" ignored="false" />
     <file path="$PROJECT_DIR$/gen/com/waikato/ssc10/BlindAssistant/BuildConfig.java" changelist="b6bf1cc6-2723-405b-9bce-7b673a0c158f" time="1373335537503" ignored="false" />
     <file path="$PROJECT_DIR$/gen/com/waikato/ssc10/BlindAssistant/R.java" changelist="b6bf1cc6-2723-405b-9bce-7b673a0c158f" time="1373335537503" ignored="false" />
     <file path="$PROJECT_DIR$/gen/com/waikato/ssc10/BlindAssistant/Manifest.java" changelist="b6bf1cc6-2723-405b-9bce-7b673a0c158f" time="1373335537503" ignored="false" />
@@ -289,23 +283,7 @@
     <disable_hints />
   </component>
   <component name="DebuggerManager">
-    <line_breakpoints default_suspend_policy="SuspendAll" default_condition_enabled="true">
-      <breakpoint url="file://$PROJECT_DIR$/test/nz/ac/waikato/ssc10/map/FileBasedAssistanceProviderTest.java" line="40" class="nz.ac.waikato.ssc10.map.FileBasedAssistanceProviderTest" package="nz.ac.waikato.ssc10.map">
-        <option name="ENABLED" value="true" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="REMOVE_AFTER_HIT" value="false" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="SUSPEND" value="true" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="true" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-    </line_breakpoints>
+    <line_breakpoints default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true">
       <breakpoint>
         <option name="NOTIFY_CAUGHT" value="true" />
@@ -394,16 +372,38 @@
       <file leaf-file-name="NavigationStep.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/nz/ac/waikato/ssc10/navigation/NavigationStep.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="32" column="56" selection-start="839" selection-end="839" vertical-scroll-proportion="0.0">
+            <state line="33" column="12" selection-start="847" selection-end="847" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="FileBasedAssistanceProviderTest.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="VoiceMethodMapper.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/nz/ac/waikato/ssc10/BlindAssistant/VoiceMethodMapper.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="109" column="12" selection-start="3570" selection-end="3647" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="VoiceInputGrammarParserTest.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/test/nz/ac/waikato/ssc10/grammar/VoiceInputGrammarParserTest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="48" column="8" selection-start="1412" selection-end="1489" vertical-scroll-proportion="-0.08405797">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="FileBasedAssistanceProviderTest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test/nz/ac/waikato/ssc10/map/FileBasedAssistanceProviderTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="20" column="48" selection-start="561" selection-end="561" vertical-scroll-proportion="0.041262135">
+            <state line="27" column="22" selection-start="890" selection-end="890" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -447,12 +447,10 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/grammar/VoiceInputGrammar.g4" />
         <option value="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/map/AssistanceStepProvier.java" />
         <option value="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/map/AssistanceStepProvider.java" />
         <option value="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/map/TimedNavigationStep.java" />
         <option value="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/map/NavigationStep.java" />
-        <option value="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/BlindAssistant/VoiceMethodMapper.java" />
         <option value="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/map/DisabilityWalkingDirections.java" />
         <option value="$PROJECT_DIR$/assets/assist-locations/assist-locations.txt" />
         <option value="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/navigation/PedestrianCrossingStep.java" />
@@ -463,6 +461,8 @@
         <option value="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/navigation/TimedNavigationStep.java" />
         <option value="$PROJECT_DIR$/test/nz/ac/waikato/ssc10/map/FileBasedAssistanceProviderTest.java" />
         <option value="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/map/FileBasedAssistanceProvider.java" />
+        <option value="$PROJECT_DIR$/src/nz/ac/waikato/ssc10/BlindAssistant/VoiceMethodMapper.java" />
+        <option value="$PROJECT_DIR$/test/nz/ac/waikato/ssc10/grammar/VoiceInputGrammarParserTest.java" />
       </list>
     </option>
   </component>
@@ -687,7 +687,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="navigation" />
+              <option name="myItemId" value="grammar" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -709,39 +709,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="map" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Application.Android" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Application.Android" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="assets" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Application.Android" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Application.Android" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="assets" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="assist-locations" />
+              <option name="myItemId" value="BlindAssistant" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -752,12 +720,12 @@
   </component>
   <component name="PropertiesComponent">
     <property name="GoToFile.includeJavaFiles" value="false" />
-    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.last.edited" value="SDKs" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit4" />
     <property name="OverrideImplement.combined" value="true" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="options.splitter.main.proportions" value="0.3" />
-    <property name="options.lastSelected" value="editor.preferences.completion" />
+    <property name="options.lastSelected" value="project.propVCSSupport.Mappings" />
     <property name="recentsLimit" value="5" />
     <property name="MemberChooser.sorted" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/test/resources" />
@@ -801,7 +769,7 @@
       <recent name="com.waikato.ssc10" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.FileBasedAssistanceProviderTest.testGetSteps_Cull">
+  <component name="RunManager" selected="Android Application.Application.Android">
     <configuration default="false" name="FileBasedAssistanceProviderTest.testGetSteps" type="JUnit" factoryName="JUnit" temporary="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
         <pattern>
@@ -867,6 +835,9 @@
         <option name="DEBUG_PORT" value="" />
         <option name="TRANSPORT" value="0" />
         <option name="LOCAL" value="true" />
+      </RunnerSettings>
+      <RunnerSettings RunnerId="Profile ">
+        <option name="myExternalizedOptions" />
       </RunnerSettings>
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Debug" />
@@ -1031,6 +1002,9 @@
       <option name="NETWORK_LATENCY" value="none" />
       <option name="CLEAR_LOGCAT" value="false" />
       <RunnerSettings RunnerId="AndroidDebugRunner" />
+      <RunnerSettings RunnerId="Profile ">
+        <option name="myExternalizedOptions" />
+      </RunnerSettings>
       <ConfigurationWrapper RunnerId="AndroidDebugRunner" />
       <method />
     </configuration>
@@ -1048,6 +1022,9 @@
       <option name="NETWORK_SPEED" value="full" />
       <option name="NETWORK_LATENCY" value="none" />
       <option name="CLEAR_LOGCAT" value="false" />
+      <RunnerSettings RunnerId="Profile ">
+        <option name="myExternalizedOptions" />
+      </RunnerSettings>
       <method />
     </configuration>
     <list size="4">
@@ -1095,12 +1072,16 @@
       <created>1374057708558</created>
       <updated>1374057708558</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="- Renamed some classes and added in decorator">
+      <created>1374833797621</created>
+      <updated>1374833797621</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32876712" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -1109,10 +1090,11 @@
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4564732" sideWeight="0.6878335" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2140411" sideWeight="0.13500534" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32876712" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32876712" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32876712" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="CDI" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32764506" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -1120,8 +1102,8 @@
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2969697" sideWeight="0.7859589" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21428572" sideWeight="0.86499465" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2969697" sideWeight="0.6712329" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2140411" sideWeight="0.86439395" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32954547" sideWeight="0.8253425" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -1129,7 +1111,6 @@
       <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32954547" sideWeight="0.84246576" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.46917808" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33035713" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -1200,24 +1181,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/nz/ac/waikato/ssc10/map/AssistedRouteGenerator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="10" column="13" selection-start="210" selection-end="210" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/nz/ac/waikato/ssc10/map/DisabilityWalkingDirections.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="32" column="73" selection-start="1071" selection-end="1071" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#790#806#0" expanded="true" />
-            <element signature="e#1293#1309#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/nz/ac/waikato/ssc10/BlindAssistant/NavigationGuideUpdateListener.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="11" column="9" selection-start="314" selection-end="314" vertical-scroll-proportion="0.0" />
@@ -1293,13 +1256,6 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/nz/ac/waikato/ssc10/navigation/NavigationStep.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="32" column="56" selection-start="839" selection-end="839" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$APPLICATION_HOME_DIR$/lib/junit-4.10.jar!/org/junit/runners/model/FrameworkMethod.class">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
@@ -1307,7 +1263,32 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/test/nz/ac/waikato/ssc10/map/FileBasedAssistanceProviderTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="48" selection-start="561" selection-end="561" vertical-scroll-proportion="0.041262135">
+        <state line="27" column="22" selection-start="890" selection-end="890" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/nz/ac/waikato/ssc10/navigation/NavigationStep.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="33" column="12" selection-start="847" selection-end="847" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/nz/ac/waikato/ssc10/BlindAssistant/VoiceMethodMapper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="109" column="12" selection-start="3570" selection-end="3647" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/nz/ac/waikato/ssc10/grammar/VoiceInputGrammarParserTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="48" column="8" selection-start="1412" selection-end="1489" vertical-scroll-proportion="-0.08405797">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

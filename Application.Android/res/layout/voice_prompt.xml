@@ -22,5 +22,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/request_assistance"
-        android:id="@+id/request_assist_button"/>
+        android:id="@+id/request_assist_button"
+        android:height="@dimen/button_size"
+        android:longClickable="false"
+        android:importantForAccessibility="yes"/>
 </LinearLayout>

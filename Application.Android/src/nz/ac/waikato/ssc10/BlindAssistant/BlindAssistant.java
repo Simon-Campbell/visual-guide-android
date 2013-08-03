@@ -22,18 +22,43 @@ import java.util.Locale;
 public class BlindAssistant {
     private static final String TAG = "BlindAssistant";
 
-    private VoiceMethodMapper mMapper;
+    private VoiceMethodFactory mMapper;
     private Context mContext;
     private TextToSpeech mTts;
 
+    private boolean isNavigating = false;
+
     private LocationManager mLocationManager;
     private Location mLastLocation;
+    private LocationListener mLocationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+            Log.d(TAG, "The location has changed to " + location.toString());
+
+            mLastLocation = location;
+        }
+
+        @Override
+        public void onStatusChanged(String s, int i, Bundle bundle) {
+            Log.d(TAG, "The status has changed to '" + s + "'");
+        }
+
+        @Override
+        public void onProviderEnabled(String s) {
+            Log.d(TAG, "The provider '" + s + "' has been enabled");
+        }
+
+        @Override
+        public void onProviderDisabled(String s) {
+            Log.d(TAG, "The provider '" + s + "' has been disabled");
+        }
+    };
 
     public BlindAssistant(Context context) {
         Log.d(TAG, "The blind assistant has been started");
 
         mContext = context;
-        mMapper = new VoiceMethodMapper();
+        mMapper = new VoiceMethodFactory();
 
         // We need to assist the user using a TTS listener!
         mTts = new TextToSpeech(mContext, new TextToSpeechInitListener());
@@ -41,33 +66,16 @@ public class BlindAssistant {
         // Set up this class so that it can track
         // the users location
         setUpLocationTracking();
+        //startLocationTracking();
     }
 
     private void setUpLocationTracking() {
         mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                mLastLocation = location;
-            }
-
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-                Log.d(TAG, "The status has changed to '" + s + "'");
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-                Log.d(TAG, "The provider '" + s + "' has been enabled");
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {
-                Log.d(TAG, "The provider '" + s + "' has been disabled");
-            }
-        });
-
         mLastLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+    }
+
+    private void startLocationTracking() {
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationListener);
     }
 
     public void assist(List<String> request) {
@@ -93,6 +101,10 @@ public class BlindAssistant {
             say("The invocation suffered from an exception");
         } finally {
         }
+    }
+
+    public boolean isNavigating() {
+        return this.isNavigating;
     }
 
     public String getLocationName() {
@@ -131,6 +143,7 @@ public class BlindAssistant {
 
     public void shutdown() {
         mTts.shutdown();
+        mLocationManager.removeUpdates(mLocationListener);
     }
 
     private class TextToSpeechInitListener implements TextToSpeech.OnInitListener {

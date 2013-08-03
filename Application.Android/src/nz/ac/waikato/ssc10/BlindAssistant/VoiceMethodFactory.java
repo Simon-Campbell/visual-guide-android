@@ -1,9 +1,11 @@
 package nz.ac.waikato.ssc10.BlindAssistant;
 
 import android.util.Log;
+import android.util.Pair;
 import nz.ac.waikato.ssc10.grammar.VoiceInputGrammarLexer;
 import nz.ac.waikato.ssc10.grammar.VoiceInputGrammarListener;
 import nz.ac.waikato.ssc10.grammar.VoiceInputGrammarParser;
+import nz.ac.waikato.ssc10.text.PlaceholderStringTemplate;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -14,10 +16,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,54 +25,26 @@ import java.util.regex.Pattern;
  * Time: 3:22 PM
  * To change this template use File | Settings | File Templates.
  */
-public class VoiceMethodMapper {
-    private static final String TAG = "VoiceMethodMapper";
+public class VoiceMethodFactory {
+    private static final String TAG = "VoiceMethodFactory";
+    private Map<PlaceholderStringTemplate, Method> voiceMethods = new VoiceMethodMap();
 
-    private Map<String, Method> voiceMethods = new HashMap<String, Method>();
-
-    public class PlaceholderComparator implements Comparator<String> {
-        @Override
-        public int compare(String s, String s2) {
-            final Pattern pattern = Pattern.compile("\\{\\d\\}");
-            final String[] literalGroups = pattern.split(s);
-
-            int lastIndex = 0;
-            int literalMatches = 0;
-
-            // For each literal group, we want to check if it exists in 's2'
-            // in order.
-            for (int i = 0; i < literalGroups.length; i++) {
-                int idx = s2.indexOf(literalGroups[i], lastIndex);
-
-                if (idx != -1) {
-                    literalMatches++;
-                } else {
-
-                }
-
-                lastIndex = idx;
-            }
-
-            return (literalMatches - literalGroups.length);
-        }
-    }
-
-    public VoiceMethodMapper() {
+    public VoiceMethodFactory() {
         try {
-            voiceMethods.put("where am I", VoiceMethodMapper.class.getDeclaredMethod("SayLocation", BlindAssistant.class));
+            voiceMethods.put(new PlaceholderStringTemplate("where am I"), VoiceMethodFactory.class.getDeclaredMethod("SayLocation", BlindAssistant.class));
         } catch (NoSuchMethodException ex) {
             Log.e(TAG, ex.getMessage());
         }
 
         try {
-            voiceMethods.put("take me to {0}", VoiceMethodMapper.class.getDeclaredMethod("SayGibberish", BlindAssistant.class, String.class));
+            voiceMethods.put(new PlaceholderStringTemplate("take me to {0}"), VoiceMethodFactory.class.getDeclaredMethod("SayGibberish", BlindAssistant.class, String.class));
         } catch (NoSuchMethodException ex) {
             Log.e(TAG, ex.getMessage());
         }
 
     }
 
-    public VoiceMethodMapper(InputStream is) throws IOException {
+    public VoiceMethodFactory(InputStream is) throws IOException {
         try {
             ANTLRInputStream inputStream = new ANTLRInputStream(is);
 

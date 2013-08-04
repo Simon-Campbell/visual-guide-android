@@ -1,7 +1,6 @@
 package nz.ac.waikato.ssc10.BlindAssistant;
 
 import android.util.Log;
-import android.util.Pair;
 import nz.ac.waikato.ssc10.grammar.VoiceInputGrammarLexer;
 import nz.ac.waikato.ssc10.grammar.VoiceInputGrammarListener;
 import nz.ac.waikato.ssc10.grammar.VoiceInputGrammarParser;
@@ -37,7 +36,7 @@ public class VoiceMethodFactory {
         }
 
         try {
-            voiceMethods.put(new PlaceholderStringTemplate("take me to {0}"), VoiceMethodFactory.class.getDeclaredMethod("SayGibberish", BlindAssistant.class, String.class));
+            voiceMethods.put(new PlaceholderStringTemplate("take me to {LOCATION}"), VoiceMethodFactory.class.getDeclaredMethod("SayGibberish", BlindAssistant.class, String.class));
         } catch (NoSuchMethodException ex) {
             Log.e(TAG, ex.getMessage());
         }

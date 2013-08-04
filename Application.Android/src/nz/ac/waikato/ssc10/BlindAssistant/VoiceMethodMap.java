@@ -31,6 +31,10 @@ public class VoiceMethodMap extends AbstractMap<PlaceholderMapStringTemplate, Vo
         return map.entrySet();
     }
 
+    public VoiceMethod put(String key, VoiceMethod value) {
+        return map.put(new PlaceholderMapStringTemplate(key), value);
+    }
+
     @Override
     public VoiceMethod put(PlaceholderMapStringTemplate key, VoiceMethod value) {
         return map.put(key, value);

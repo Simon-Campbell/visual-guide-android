@@ -4,7 +4,6 @@ import android.util.Log;
 import nz.ac.waikato.ssc10.grammar.VoiceInputGrammarLexer;
 import nz.ac.waikato.ssc10.grammar.VoiceInputGrammarListener;
 import nz.ac.waikato.ssc10.grammar.VoiceInputGrammarParser;
-import nz.ac.waikato.ssc10.text.PlaceholderMapStringTemplate;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -50,13 +49,13 @@ public class VoiceMethodFactory {
     };
 
     private VoiceMethodFactory() {
-        voiceMethods.put(new PlaceholderMapStringTemplate("where am I"), sayUserLocation);
+        voiceMethods.put("where am I", sayUserLocation);
 
-        voiceMethods.put(new PlaceholderMapStringTemplate("take me to {Destination}"), navigateUser);
-        voiceMethods.put(new PlaceholderMapStringTemplate("navigate to {Destination}"), navigateUser);
+        voiceMethods.put("take me to {Destination}", navigateUser);
+        voiceMethods.put("navigate to {Destination}", navigateUser);
 
-        voiceMethods.put(new PlaceholderMapStringTemplate("stop navigating"), stopNavigating);
-        voiceMethods.put(new PlaceholderMapStringTemplate("stop navigation"), stopNavigating);
+        voiceMethods.put("stop navigating", stopNavigating);
+        voiceMethods.put("stop navigation", stopNavigating);
     }
 
     public VoiceMethodFactory(InputStream is) throws IOException {

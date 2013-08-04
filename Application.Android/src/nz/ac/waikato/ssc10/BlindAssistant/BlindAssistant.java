@@ -8,8 +8,6 @@ import android.util.Log;
 import org.javatuples.Pair;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -89,19 +87,15 @@ public class BlindAssistant {
     public void assist(String request) {
         Log.d(TAG, "The blind assistant is assisting the user with the request " + request);
 
-        Pair<Method, Map<String, String>> m = mMapper.get(request);
-        Method method = m.getValue0();
+        Pair<VoiceMethod, Map<String, String>> m = mMapper.get(request);
+        VoiceMethod method = m.getValue0();
 
         try {
             if (m != null) {
-                method.invoke(mMapper, this, m.getValue1());
+                method.invoke(this, m.getValue1());
             } else {
                 say("I am unable to help you with the request. I heard " + request);
             }
-        } catch (IllegalAccessException e) {
-            say("The method invoked was not able to be accessed");
-        } catch (InvocationTargetException e) {
-            say("The invocation suffered from an exception");
         } finally {
         }
     }

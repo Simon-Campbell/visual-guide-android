@@ -15,7 +15,6 @@ import org.javatuples.Pair;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.util.Map;
 
 /**
@@ -29,19 +28,23 @@ public class VoiceMethodFactory {
     private static final String TAG = "VoiceMethodFactory";
     private VoiceMethodMap voiceMethods = new VoiceMethodMap();
 
+    private VoiceMethod sayUserLocation = new VoiceMethod() {
+        @Override
+        public void invoke(BlindAssistant assistant, Map<String, String> arguments) {
+            assistant.say("you are at " + assistant.getLocationName());
+        }
+    };
+
+    private VoiceMethod navigateUser = new VoiceMethod() {
+        @Override
+        public void invoke(BlindAssistant assistant, Map<String, String> arguments) {
+            assistant.say("taking you to " + arguments.get("{Destination}"));
+        }
+    };
+
     public VoiceMethodFactory() {
-        try {
-            voiceMethods.put(new PlaceholderMapStringTemplate("where am I"), VoiceMethodFactory.class.getDeclaredMethod("SayLocation", BlindAssistant.class, Map.class));
-        } catch (NoSuchMethodException ex) {
-            Log.e(TAG, ex.getMessage());
-        }
-
-        try {
-            voiceMethods.put(new PlaceholderMapStringTemplate("take me to {Destination}"), VoiceMethodFactory.class.getDeclaredMethod("SayGibberish", BlindAssistant.class, Map.class));
-        } catch (NoSuchMethodException ex) {
-            Log.e(TAG, ex.getMessage());
-        }
-
+        voiceMethods.put(new PlaceholderMapStringTemplate("where am I"), sayUserLocation);
+        voiceMethods.put(new PlaceholderMapStringTemplate("take me to {Destination}"), navigateUser);
     }
 
     public VoiceMethodFactory(InputStream is) throws IOException {
@@ -62,16 +65,8 @@ public class VoiceMethodFactory {
         }
     }
 
-    public Pair<Method, Map<String, String>> get(String input) {
+    public Pair<VoiceMethod, Map<String, String>> get(String input) {
         return voiceMethods.get(input);
-    }
-
-    public void SayLocation(BlindAssistant assistant, Map<String, String> arguments) {
-        assistant.say("you are at " + assistant.getLocationName());
-    }
-
-    public void SayGibberish(BlindAssistant assistant, Map<String, String> arguments) {
-        assistant.say("taking you to " + arguments.get("{Destination}"));
     }
 
     private class VoiceInputWalker implements VoiceInputGrammarListener {

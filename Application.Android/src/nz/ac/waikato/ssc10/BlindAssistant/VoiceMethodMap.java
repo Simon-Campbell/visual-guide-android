@@ -3,7 +3,6 @@ package nz.ac.waikato.ssc10.BlindAssistant;
 import nz.ac.waikato.ssc10.text.PlaceholderMapStringTemplate;
 import org.javatuples.Pair;
 
-import java.lang.reflect.Method;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,38 +15,38 @@ import java.util.Set;
  * Time: 5:14 PM
  * To change this template use File | Settings | File Templates.
  */
-public class VoiceMethodMap extends AbstractMap<PlaceholderMapStringTemplate, Method> {
-    private Map<PlaceholderMapStringTemplate, Method> map;
+public class VoiceMethodMap extends AbstractMap<PlaceholderMapStringTemplate, VoiceMethod> {
+    private Map<PlaceholderMapStringTemplate, VoiceMethod> map;
 
     public VoiceMethodMap() {
-        this.map = new HashMap<PlaceholderMapStringTemplate, Method>();
+        this.map = new HashMap<PlaceholderMapStringTemplate, VoiceMethod>();
     }
 
-    public VoiceMethodMap(Map<PlaceholderMapStringTemplate, Method> map) {
+    public VoiceMethodMap(Map<PlaceholderMapStringTemplate, VoiceMethod> map) {
         this.map = map;
     }
 
     @Override
-    public Set<Entry<PlaceholderMapStringTemplate, Method>> entrySet() {
+    public Set<Entry<PlaceholderMapStringTemplate, VoiceMethod>> entrySet() {
         return map.entrySet();
     }
 
     @Override
-    public Method put(PlaceholderMapStringTemplate key, Method value) {
+    public VoiceMethod put(PlaceholderMapStringTemplate key, VoiceMethod value) {
         return map.put(key, value);
     }
 
     @Override
-    public Method remove(Object key) {
+    public VoiceMethod remove(Object key) {
         return map.remove(key);
     }
 
-    public Pair<Method, Map<String, String>> get(String concreteKey) {
-        for (Entry<PlaceholderMapStringTemplate, Method> entry : map.entrySet()) {
+    public Pair<VoiceMethod, Map<String, String>> get(String concreteKey) {
+        for (Entry<PlaceholderMapStringTemplate, VoiceMethod> entry : map.entrySet()) {
             Map<String, String> args = entry.getKey().variables(concreteKey);
 
             if (args != null) {
-                return new Pair<Method, Map<String, String>>(entry.getValue(), args);
+                return new Pair<VoiceMethod, Map<String, String>>(entry.getValue(), args);
             }
         }
 

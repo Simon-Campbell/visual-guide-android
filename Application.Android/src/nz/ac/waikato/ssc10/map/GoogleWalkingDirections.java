@@ -34,7 +34,7 @@ public class GoogleWalkingDirections implements WalkingDirections {
 
     private static final String API_MODE_PARAM = "mode";
 
-    public GoogleWalkingDirections(String startAddress, String endAddress) {
+    public GoogleWalkingDirections(String startAddress, String endAddress) throws NoSuchRouteException {
         this.startAddress = startAddress;
         this.endAddress = endAddress;
 
@@ -71,14 +71,14 @@ public class GoogleWalkingDirections implements WalkingDirections {
         return content.toString();
     }
 
-    private void update() {
+    private void update() throws NoSuchRouteException {
         try {
             setFromJson(getDirections(this.startAddress, this.endAddress));
         } catch (IOException e) {
             // throw e;
             e.printStackTrace();
         } catch (NoSuchRouteException e) {
-            e.printStackTrace();
+            throw e;
         } catch (JSONException e) {
             e.printStackTrace();
         }

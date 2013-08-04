@@ -1,10 +1,16 @@
 package nz.ac.waikato.ssc10.BlindAssistant;
 
 import android.content.Context;
-import android.location.*;
-import android.os.Bundle;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import nz.ac.waikato.ssc10.map.GoogleWalkingDirections;
+import nz.ac.waikato.ssc10.map.NoSuchRouteException;
+import nz.ac.waikato.ssc10.map.WalkingDirections;
 import org.javatuples.Pair;
 
 import java.io.IOException;
@@ -22,60 +28,22 @@ import java.util.Map;
 public class BlindAssistant {
     private static final String TAG = "BlindAssistant";
 
-    private VoiceMethodFactory mMapper;
-    private Context mContext;
-    private TextToSpeech mTts;
+    private VoiceMethodFactory voiceMethodFactory;
+    private Context context;
+    private TextToSpeech tts;
 
     private boolean isNavigating = false;
-
-    private LocationManager mLocationManager;
-    private Location mLastLocation;
-    private LocationListener mLocationListener = new LocationListener() {
-        @Override
-        public void onLocationChanged(Location location) {
-            Log.d(TAG, "The location has changed to " + location.toString());
-
-            mLastLocation = location;
-        }
-
-        @Override
-        public void onStatusChanged(String s, int i, Bundle bundle) {
-            Log.d(TAG, "The status has changed to '" + s + "'");
-        }
-
-        @Override
-        public void onProviderEnabled(String s) {
-            Log.d(TAG, "The provider '" + s + "' has been enabled");
-        }
-
-        @Override
-        public void onProviderDisabled(String s) {
-            Log.d(TAG, "The provider '" + s + "' has been disabled");
-        }
-    };
+    private IncrementalNavigator navigator = null;
 
     public BlindAssistant(Context context) {
         Log.d(TAG, "The blind assistant has been started");
 
-        mContext = context;
-        mMapper = new VoiceMethodFactory();
+        this.context = context;
+        this.voiceMethodFactory = VoiceMethodFactory.createStandardFactory();
 
         // We need to assist the user using a TTS listener!
-        mTts = new TextToSpeech(mContext, new TextToSpeechInitListener());
-
-        // Set up this class so that it can track
-        // the users location
-        setUpLocationTracking();
-        //startLocationTracking();
-    }
-
-    private void setUpLocationTracking() {
-        mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
-        mLastLocation = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-    }
-
-    private void startLocationTracking() {
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationListener);
+        this.tts = new TextToSpeech(this.context, new TextToSpeechInitListener());
+        this.navigator = new IncrementalNavigator((LocationManager) context.getSystemService(Context.LOCATION_SERVICE));
     }
 
     public void assist(List<String> request) {
@@ -84,10 +52,52 @@ public class BlindAssistant {
         say("I cannot assist with this input");
     }
 
+    public void sayCurrentLocation() {
+        say("you are currently at " + getCurrentLocationName());
+    }
+
+    public void navigateTo(String destination) {
+        if (destination != null) {
+            final String from = getCurrentLocationName();
+            final String to = destination + " New Zealand";
+
+            say("getting directions to " + destination);
+
+            WalkingDirectionsTask task = new WalkingDirectionsTask();
+            task.execute(from, to);
+        } else {
+            say("stopping navigation");
+
+            navigator.setWalkingDirections(null);
+        }
+    }
+
+    private class WalkingDirectionsTask extends AsyncTask<String, Double, WalkingDirections> {
+
+        @Override
+        protected WalkingDirections doInBackground(String... strings) {
+            WalkingDirections directions = null;
+            try {
+                directions = new GoogleWalkingDirections(strings[0], strings[1]);
+            } catch (NoSuchRouteException ex) {
+                Log.e(TAG, "A route was not able to be found", ex);
+
+                say("i was unable to route you from " + strings[0] + " to " + strings[1]);
+            } finally {
+                return directions;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(WalkingDirections result) {
+            navigator.setWalkingDirections(result);
+        }
+    }
+
     public void assist(String request) {
         Log.d(TAG, "The blind assistant is assisting the user with the request " + request);
 
-        Pair<VoiceMethod, Map<String, String>> m = mMapper.get(request);
+        Pair<VoiceMethod, Map<String, String>> m = voiceMethodFactory.get(request);
         VoiceMethod method = m.getValue0();
 
         try {
@@ -100,17 +110,17 @@ public class BlindAssistant {
         }
     }
 
-    public boolean isNavigating() {
-        return this.isNavigating;
+    public String getCurrentLocationName() {
+        return getLocationName(navigator.getLastLocation());
     }
 
-    public String getLocationName() {
+    public String getLocationName(Location location) {
         String locationName;
-        Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
+        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
 
-        if (mLastLocation != null) {
+        if (location != null) {
             try {
-                List<Address> addresses = geocoder.getFromLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude(), 1);
+                List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
 
                 if (addresses.isEmpty()) {
                     locationName = "unknown location";
@@ -135,12 +145,12 @@ public class BlindAssistant {
     }
 
     public void say(String text) {
-        mTts.speak(text, TextToSpeech.QUEUE_ADD, null);
+        tts.speak(text, TextToSpeech.QUEUE_ADD, null);
     }
 
     public void shutdown() {
-        mTts.shutdown();
-        mLocationManager.removeUpdates(mLocationListener);
+        tts.shutdown();
+        navigator.shutdown();
     }
 
     private class TextToSpeechInitListener implements TextToSpeech.OnInitListener {

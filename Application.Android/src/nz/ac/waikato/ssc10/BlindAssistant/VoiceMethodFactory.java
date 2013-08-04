@@ -31,20 +31,32 @@ public class VoiceMethodFactory {
     private VoiceMethod sayUserLocation = new VoiceMethod() {
         @Override
         public void invoke(BlindAssistant assistant, Map<String, String> arguments) {
-            assistant.say("you are at " + assistant.getLocationName());
+            assistant.sayCurrentLocation();
+        }
+    };
+
+    private VoiceMethod stopNavigating = new VoiceMethod() {
+        @Override
+        public void invoke(BlindAssistant assistant, Map<String, String> arguments) {
+            assistant.navigateTo(null);
         }
     };
 
     private VoiceMethod navigateUser = new VoiceMethod() {
         @Override
         public void invoke(BlindAssistant assistant, Map<String, String> arguments) {
-            assistant.say("taking you to " + arguments.get("{Destination}"));
+            assistant.navigateTo(arguments.get("{Destination}"));
         }
     };
 
-    public VoiceMethodFactory() {
+    private VoiceMethodFactory() {
         voiceMethods.put(new PlaceholderMapStringTemplate("where am I"), sayUserLocation);
+
         voiceMethods.put(new PlaceholderMapStringTemplate("take me to {Destination}"), navigateUser);
+        voiceMethods.put(new PlaceholderMapStringTemplate("navigate to {Destination}"), navigateUser);
+
+        voiceMethods.put(new PlaceholderMapStringTemplate("stop navigating"), stopNavigating);
+        voiceMethods.put(new PlaceholderMapStringTemplate("stop navigation"), stopNavigating);
     }
 
     public VoiceMethodFactory(InputStream is) throws IOException {
@@ -63,6 +75,10 @@ public class VoiceMethodFactory {
 
             throw ex;
         }
+    }
+
+    public static VoiceMethodFactory createStandardFactory() {
+        return new VoiceMethodFactory();
     }
 
     public Pair<VoiceMethod, Map<String, String>> get(String input) {

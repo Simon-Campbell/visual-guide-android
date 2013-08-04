@@ -5,12 +5,14 @@ import android.location.*;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import org.javatuples.Pair;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -87,11 +89,12 @@ public class BlindAssistant {
     public void assist(String request) {
         Log.d(TAG, "The blind assistant is assisting the user with the request " + request);
 
-        Method m = mMapper.get(request);
+        Pair<Method, Map<String, String>> m = mMapper.get(request);
+        Method method = m.getValue0();
 
         try {
             if (m != null) {
-                m.invoke(mMapper, this);
+                method.invoke(mMapper, this, m.getValue1());
             } else {
                 say("I am unable to help you with the request. I heard " + request);
             }

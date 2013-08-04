@@ -1,7 +1,7 @@
 package nz.ac.waikato.ssc10.BlindAssistant;
 
-import android.util.Pair;
-import nz.ac.waikato.ssc10.text.PlaceholderStringTemplate;
+import nz.ac.waikato.ssc10.text.PlaceholderMapStringTemplate;
+import org.javatuples.Pair;
 
 import java.lang.reflect.Method;
 import java.util.AbstractMap;
@@ -16,24 +16,24 @@ import java.util.Set;
  * Time: 5:14 PM
  * To change this template use File | Settings | File Templates.
  */
-public class VoiceMethodMap extends AbstractMap<PlaceholderStringTemplate, Method> {
-    private Map<PlaceholderStringTemplate, Method> map;
+public class VoiceMethodMap extends AbstractMap<PlaceholderMapStringTemplate, Method> {
+    private Map<PlaceholderMapStringTemplate, Method> map;
 
     public VoiceMethodMap() {
-        this.map = new HashMap<PlaceholderStringTemplate, Method>();
+        this.map = new HashMap<PlaceholderMapStringTemplate, Method>();
     }
 
-    public VoiceMethodMap(Map<PlaceholderStringTemplate, Method> map) {
+    public VoiceMethodMap(Map<PlaceholderMapStringTemplate, Method> map) {
         this.map = map;
     }
 
     @Override
-    public Set<Entry<PlaceholderStringTemplate, Method>> entrySet() {
+    public Set<Entry<PlaceholderMapStringTemplate, Method>> entrySet() {
         return map.entrySet();
     }
 
     @Override
-    public Method put(PlaceholderStringTemplate key, Method value) {
+    public Method put(PlaceholderMapStringTemplate key, Method value) {
         return map.put(key, value);
     }
 
@@ -42,12 +42,12 @@ public class VoiceMethodMap extends AbstractMap<PlaceholderStringTemplate, Metho
         return map.remove(key);
     }
 
-    public Pair<Method, String[]> get(String concreteKey) {
-        for (Entry<PlaceholderStringTemplate, Method> entry : map.entrySet()) {
-            String[] args = entry.getKey().variables(concreteKey);
+    public Pair<Method, Map<String, String>> get(String concreteKey) {
+        for (Entry<PlaceholderMapStringTemplate, Method> entry : map.entrySet()) {
+            Map<String, String> args = entry.getKey().variables(concreteKey);
 
             if (args != null) {
-                return new Pair<Method, String[]>(entry.getValue(), args);
+                return new Pair<Method, Map<String, String>>(entry.getValue(), args);
             }
         }
 

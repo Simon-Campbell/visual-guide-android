@@ -4,13 +4,14 @@ import android.util.Log;
 import nz.ac.waikato.ssc10.grammar.VoiceInputGrammarLexer;
 import nz.ac.waikato.ssc10.grammar.VoiceInputGrammarListener;
 import nz.ac.waikato.ssc10.grammar.VoiceInputGrammarParser;
-import nz.ac.waikato.ssc10.text.PlaceholderStringTemplate;
+import nz.ac.waikato.ssc10.text.PlaceholderMapStringTemplate;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.javatuples.Pair;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,17 +27,17 @@ import java.util.Map;
  */
 public class VoiceMethodFactory {
     private static final String TAG = "VoiceMethodFactory";
-    private Map<PlaceholderStringTemplate, Method> voiceMethods = new VoiceMethodMap();
+    private VoiceMethodMap voiceMethods = new VoiceMethodMap();
 
     public VoiceMethodFactory() {
         try {
-            voiceMethods.put(new PlaceholderStringTemplate("where am I"), VoiceMethodFactory.class.getDeclaredMethod("SayLocation", BlindAssistant.class));
+            voiceMethods.put(new PlaceholderMapStringTemplate("where am I"), VoiceMethodFactory.class.getDeclaredMethod("SayLocation", BlindAssistant.class, Map.class));
         } catch (NoSuchMethodException ex) {
             Log.e(TAG, ex.getMessage());
         }
 
         try {
-            voiceMethods.put(new PlaceholderStringTemplate("take me to {LOCATION}"), VoiceMethodFactory.class.getDeclaredMethod("SayGibberish", BlindAssistant.class, String.class));
+            voiceMethods.put(new PlaceholderMapStringTemplate("take me to {Destination}"), VoiceMethodFactory.class.getDeclaredMethod("SayGibberish", BlindAssistant.class, Map.class));
         } catch (NoSuchMethodException ex) {
             Log.e(TAG, ex.getMessage());
         }
@@ -61,16 +62,16 @@ public class VoiceMethodFactory {
         }
     }
 
-    public Method get(String input) {
+    public Pair<Method, Map<String, String>> get(String input) {
         return voiceMethods.get(input);
     }
 
-    public void SayLocation(BlindAssistant assistant) {
+    public void SayLocation(BlindAssistant assistant, Map<String, String> arguments) {
         assistant.say("you are at " + assistant.getLocationName());
     }
 
-    public void SayGibberish(BlindAssistant assistant, String location) {
-        assistant.say("taking you to " + location);
+    public void SayGibberish(BlindAssistant assistant, Map<String, String> arguments) {
+        assistant.say("taking you to " + arguments.get("{Destination}"));
     }
 
     private class VoiceInputWalker implements VoiceInputGrammarListener {

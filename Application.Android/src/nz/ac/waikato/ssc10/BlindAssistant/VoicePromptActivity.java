@@ -1,33 +1,39 @@
 package nz.ac.waikato.ssc10.BlindAssistant;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import nz.ac.waikato.ssc10.map.GoogleWalkingDirections;
-import nz.ac.waikato.ssc10.map.WalkingDirections;
+import com.google.android.gms.common.ConnectionResult;
 
 import java.util.ArrayList;
 
+import static com.google.android.gms.common.GooglePlayServicesUtil.isGooglePlayServicesAvailable;
+
 /**
- * Created with IntelliJ IDEA.
- * User: Simon
- * Date: 9/07/13
- * Time: 1:57 PM
- * To change this template use File | Settings | File Templates.
+ * An activity that prompts the user for voice input. This is where commands are
+ * input by touching a button on screen.
  */
 public class VoicePromptActivity extends Activity {
     private static final String TAG = "VoicePromptActivity";
 
+    private int googlePlayServices = ConnectionResult.SERVICE_MISSING;
+
     private BlindAssistant mAssistant;
     private SpeechRecognizer mRecognizer;
+
     private TextView mStatus;
     private Button mButton;
 
@@ -35,15 +41,7 @@ public class VoicePromptActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.voice_prompt);
 
-//        Thread t = new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                WalkingDirections route = new GoogleWalkingDirections("Hamilton, New Zealand", "Te Awamutu, New Zealand");
-//            }
-//        });
-//
-//        //
-//        t.start();
+        doBindService();
 
         mButton = (Button) findViewById(R.id.request_assist_button);
         mStatus = (TextView) findViewById(R.id.textview_status);
@@ -56,7 +54,11 @@ public class VoicePromptActivity extends Activity {
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 switch (motionEvent.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        startListening();
+                        if (googlePlayServices == ConnectionResult.SUCCESS) {
+                            startListening();
+                        } else {
+                            mAssistant.say("Google Play Services is not available");
+                        }
 
                         return true;
 
@@ -74,7 +76,29 @@ public class VoicePromptActivity extends Activity {
         mRecognizer.setRecognitionListener(new VoiceRecognitionListener());
     }
 
-    private void startListening() {
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        googlePlayServices = isGooglePlayServicesAvailable(this);
+    }
+
+    @Override
+    // TODO: implement MediaIntentReceiver in BlindAssistantService
+    //  http://stackoverflow.com/a/11510564/350724
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        Log.i(TAG, "onKeyDown -> keyCode = " + keyCode);
+
+        if (keyCode == KeyEvent.KEYCODE_HEADSETHOOK) {
+            startListening();
+
+            return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
+    public void startListening() {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
 
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
@@ -88,11 +112,14 @@ public class VoicePromptActivity extends Activity {
         mRecognizer.stopListening();
     }
 
+    @Override
     protected void onDestroy() {
         super.onDestroy();
 
         mRecognizer.cancel();
         mRecognizer.destroy();
+
+        doUnbindService();
 
         mAssistant.shutdown();
     }
@@ -309,4 +336,31 @@ public class VoicePromptActivity extends Activity {
 
 
     }
+
+    private BlindAssistantService blindAssistantService;
+    private boolean blindAssistantServiceBounded;
+
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            blindAssistantService = ((BlindAssistantService.BlindAssistantBinder) service).getService();
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            blindAssistantService = null;
+        }
+    };
+
+    private void doBindService() {
+        bindService(new Intent(this, BlindAssistantService.class), serviceConnection, Context.BIND_AUTO_CREATE);
+        blindAssistantServiceBounded = true;
+    }
+
+    void doUnbindService() {
+        if (blindAssistantServiceBounded) {
+            // Detach our existing connection.
+            unbindService(serviceConnection);
+            blindAssistantServiceBounded = false;
+        }
+    }
+
 }

@@ -25,4 +25,6 @@
     <string name="voice_err_server">The voice recognition server sent an error status</string>
     <string name="voice_err_speech_timeout">There was no speech input</string>
     <string name="voice_err_unk">An unknown error has occurred</string>
+
+    <string name="say_current_location">You are currently at %1$s</string>
 </resources>

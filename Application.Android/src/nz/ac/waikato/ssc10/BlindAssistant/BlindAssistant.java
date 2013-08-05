@@ -4,13 +4,17 @@ import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.location.LocationClient;
 import nz.ac.waikato.ssc10.map.GoogleWalkingDirections;
 import nz.ac.waikato.ssc10.map.NoSuchRouteException;
 import nz.ac.waikato.ssc10.map.WalkingDirections;
+import nz.ac.waikato.ssc10.navigation.NavigationStep;
 import org.javatuples.Pair;
 
 import java.io.IOException;
@@ -25,7 +29,7 @@ import java.util.Map;
  * Time: 2:12 PM
  * To change this template use File | Settings | File Templates.
  */
-public class BlindAssistant {
+public class BlindAssistant implements NavigatorUpdateListener {
     private static final String TAG = "BlindAssistant";
 
     private VoiceMethodFactory voiceMethodFactory;
@@ -33,7 +37,9 @@ public class BlindAssistant {
     private TextToSpeech tts;
 
     private boolean isNavigating = false;
+
     private IncrementalNavigator navigator = null;
+    private LocationClient locationClient = null;
 
     public BlindAssistant(Context context) {
         Log.d(TAG, "The blind assistant has been started");
@@ -43,20 +49,29 @@ public class BlindAssistant {
 
         // We need to assist the user using a TTS listener!
         this.tts = new TextToSpeech(this.context, new TextToSpeechInitListener());
-        this.navigator = new IncrementalNavigator((LocationManager) context.getSystemService(Context.LOCATION_SERVICE));
-    }
 
-    public void assist(List<String> request) {
-        Log.d(TAG, "The blind assistant is assisting the user with the request " + request);
+        // Set up a location client, when it connects then we'll create a navigation
+        // guide object
+        this.locationClient = new LocationClient(context,
+                googlePlayerServicesConnectionCallbacks,
+                googlePlayServicesOnConnectionFailedListener);
 
-        say("I cannot assist with this input");
+        // Start the connect process!
+        this.locationClient.connect();
     }
 
     public void sayCurrentLocation() {
-        say("you are currently at " + getCurrentLocationName());
+        say(String.format(context.getString(R.string.say_current_location), getCurrentLocationName()));
     }
 
     public void navigateTo(String destination) {
+        if (navigator == null) {
+            say("please wait until the location service has been connected to then try again");
+
+            // ..
+            return;
+        }
+
         if (destination != null) {
             final String from = getCurrentLocationName();
             final String to = destination + " New Zealand";
@@ -70,6 +85,15 @@ public class BlindAssistant {
 
             navigator.setWalkingDirections(null);
         }
+    }
+
+    @Override
+    public void onNavigationPathChange(IncrementalNavigator guide) {
+    }
+
+    @Override
+    public void onNavigationStepChange(IncrementalNavigator guide, NavigationStep step) {
+        sayInstruction(guide.getCurrentInstruction());
     }
 
     private class WalkingDirectionsTask extends AsyncTask<String, Double, WalkingDirections> {
@@ -94,14 +118,18 @@ public class BlindAssistant {
         }
     }
 
+    public void sayInstruction(String instruction) {
+        tts.speak(instruction, TextToSpeech.QUEUE_FLUSH, null);
+    }
+
     public void assist(String request) {
         Log.d(TAG, "The blind assistant is assisting the user with the request " + request);
 
         Pair<VoiceMethod, Map<String, String>> m = voiceMethodFactory.get(request);
-        VoiceMethod method = m.getValue0();
 
         try {
             if (m != null) {
+                VoiceMethod method = m.getValue0();
                 method.invoke(this, m.getValue1());
             } else {
                 say("I am unable to help you with the request. I heard " + request);
@@ -111,7 +139,11 @@ public class BlindAssistant {
     }
 
     public String getCurrentLocationName() {
-        return getLocationName(navigator.getLastLocation());
+        if (navigator != null) {
+            return getLocationName(navigator.getLastLocation());
+        } else {
+            return "unknown";
+        }
     }
 
     public String getLocationName(Location location) {
@@ -159,4 +191,29 @@ public class BlindAssistant {
         public void onInit(int i) {
         }
     }
+
+    private GooglePlayServicesClient.ConnectionCallbacks googlePlayerServicesConnectionCallbacks = new GooglePlayServicesClient.ConnectionCallbacks() {
+        @Override
+        public void onConnected(Bundle bundle) {
+            say("the application has connected to the location service");
+
+            navigator = new IncrementalNavigator(locationClient);
+            navigator.setNavigatorUpdateListener(BlindAssistant.this);
+        }
+
+        @Override
+        public void onDisconnected() {
+            say("the application has disconnected from the location service");
+
+            navigator.shutdown();
+        }
+    };
+
+    private GooglePlayServicesClient.OnConnectionFailedListener googlePlayServicesOnConnectionFailedListener = new GooglePlayServicesClient.OnConnectionFailedListener() {
+        @Override
+        public void onConnectionFailed(ConnectionResult connectionResult) {
+            say("the connection to Google Play Services failed");
+        }
+    };
+
 }

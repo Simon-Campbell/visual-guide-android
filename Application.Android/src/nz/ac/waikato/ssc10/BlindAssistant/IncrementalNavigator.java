@@ -1,10 +1,10 @@
 package nz.ac.waikato.ssc10.BlindAssistant;
 
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Bundle;
 import android.util.Log;
+import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import nz.ac.waikato.ssc10.map.LatLng;
 import nz.ac.waikato.ssc10.map.WalkingDirections;
 import nz.ac.waikato.ssc10.navigation.NavigationStep;
@@ -24,12 +24,14 @@ public class IncrementalNavigator {
     private static String TAG = "IncrementalNavigator";
 
     private int currentIdx = 0;
-    private float bearing;
+    private float headingBearing = 0.0f;
 
     private Queue<Location> movementHistory;
     private NavigatorUpdateListener navigatorUpdateListener;
 
-    private LocationManager locationManager;
+    private LocationClient locationClient;
+    private LocationRequest locationRequest;
+
     private WalkingDirections walkingDirections;
 
     private LocationListener locationListener = new LocationListener() {
@@ -37,27 +39,24 @@ public class IncrementalNavigator {
         public void onLocationChanged(Location location) {
             Log.d(TAG, "The location has changed to " + location.toString());
 
+            if (navigatorUpdateListener != null && walkingDirections != null) {
+                navigatorUpdateListener.onNavigationStepChange(IncrementalNavigator.this, walkingDirections.getSteps().get(currentIdx));
+            }
+
             movementHistory.add(location);
-        }
-
-        @Override
-        public void onStatusChanged(String s, int i, Bundle bundle) {
-            Log.d(TAG, "The status has changed to '" + s + "'");
-        }
-
-        @Override
-        public void onProviderEnabled(String s) {
-            Log.d(TAG, "The provider '" + s + "' has been enabled");
-        }
-
-        @Override
-        public void onProviderDisabled(String s) {
-            Log.d(TAG, "The provider '" + s + "' has been disabled");
         }
     };
 
-    public IncrementalNavigator(LocationManager locationManager) {
-        this.locationManager = locationManager;
+    public IncrementalNavigator(LocationClient locationClient) {
+        this.locationRequest = LocationRequest.create();
+        this.locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        this.locationRequest.setInterval(5000);
+        this.locationRequest.setFastestInterval(1000);
+        this.locationClient = locationClient;
+        this.headingBearing = locationClient
+                .getLastLocation()
+                .getBearing();
+
         this.movementHistory = new ArrayBlockingQueue<Location>(128);
     }
 
@@ -66,21 +65,22 @@ public class IncrementalNavigator {
     }
 
     public void shutdown() {
-        this.locationManager.removeUpdates(locationListener);
+        this.locationClient.removeLocationUpdates(locationListener);
+        this.locationClient.disconnect();
     }
 
     public void setWalkingDirections(WalkingDirections walkingDirections) {
         this.walkingDirections = walkingDirections;
 
         if (walkingDirections != null) {
-            this.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+            this.locationClient.requestLocationUpdates(locationRequest, locationListener);
         } else {
-            this.locationManager.removeUpdates(locationListener);
+            this.locationClient.removeLocationUpdates(locationListener);
         }
     }
 
     public Location getLastLocation() {
-        return this.locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        return this.locationClient.getLastLocation();
     }
 
     public String getCurrentInstruction() {
@@ -106,10 +106,6 @@ public class IncrementalNavigator {
         }
 
         return next;
-    }
-
-    public void setBearing(float bearing) {
-        this.bearing = bearing;
     }
 
     private int getNextRouteIndex() {

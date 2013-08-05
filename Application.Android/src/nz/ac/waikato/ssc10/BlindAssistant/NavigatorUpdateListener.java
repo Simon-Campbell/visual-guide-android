@@ -1,6 +1,6 @@
 package nz.ac.waikato.ssc10.BlindAssistant;
 
-import android.graphics.Point;
+import nz.ac.waikato.ssc10.navigation.NavigationStep;
 
 /**
  * An interface for defining events for objects which
@@ -12,7 +12,7 @@ public interface NavigatorUpdateListener {
      *
      * @param guide The guide that has left the path
      */
-    void onPersonLeavePath(IncrementalNavigator guide);
+    void onNavigationPathChange(IncrementalNavigator guide);
 
     /**
      * This event is called when the guide reaches a junction
@@ -20,5 +20,5 @@ public interface NavigatorUpdateListener {
      * @param guide The guide that has reached a junction point
      *              on the path
      */
-    void onPersonReachJunction(IncrementalNavigator guide, Point junction);
+    void onNavigationStepChange(IncrementalNavigator guide, NavigationStep navigationStep);
 }

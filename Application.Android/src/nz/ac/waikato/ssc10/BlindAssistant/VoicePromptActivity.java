@@ -8,7 +8,6 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.speech.RecognitionListener;
-import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -29,10 +28,10 @@ import static com.google.android.gms.common.GooglePlayServicesUtil.isGooglePlayS
 public class VoicePromptActivity extends Activity {
     private static final String TAG = "VoicePromptActivity";
 
-    private int googlePlayServices = ConnectionResult.SERVICE_MISSING;
+    private BlindAssistantService blindAssistantService;
+    private boolean blindAssistantServiceBounded;
 
-    private BlindAssistant mAssistant;
-    private SpeechRecognizer mRecognizer;
+    private int googlePlayServices = ConnectionResult.SERVICE_MISSING;
 
     private TextView mStatus;
     private Button mButton;
@@ -41,13 +40,10 @@ public class VoicePromptActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.voice_prompt);
 
-        doBindService();
+        this.doBindService();
 
         mButton = (Button) findViewById(R.id.request_assist_button);
         mStatus = (TextView) findViewById(R.id.textview_status);
-
-        mRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
-        mAssistant = new BlindAssistant(this);
 
         mButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -55,17 +51,14 @@ public class VoicePromptActivity extends Activity {
                 switch (motionEvent.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         if (googlePlayServices == ConnectionResult.SUCCESS) {
-                            startListening();
+                            blindAssistantService.listen();
                         } else {
-                            mAssistant.say("Google Play Services is not available");
+                            blindAssistantService.say("Google Play Services is not available");
                         }
 
                         return true;
 
                     case MotionEvent.ACTION_UP:
-                        //stopListening();
-                        //showStatus(VoiceStatus.RESULTS , "");
-
                         return false;
                 }
 
@@ -73,7 +66,6 @@ public class VoicePromptActivity extends Activity {
             }
         });
 
-        mRecognizer.setRecognitionListener(new VoiceRecognitionListener());
     }
 
     @Override
@@ -90,55 +82,28 @@ public class VoicePromptActivity extends Activity {
         Log.i(TAG, "onKeyDown -> keyCode = " + keyCode);
 
         if (keyCode == KeyEvent.KEYCODE_HEADSETHOOK) {
-            startListening();
-
+            blindAssistantService.listen();
             return true;
         }
 
         return super.onKeyDown(keyCode, event);
     }
 
-    public void startListening() {
-        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, VoicePromptActivity.this.getPackageName());
-        intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
-
-        mRecognizer.startListening(intent);
-    }
-
-    private void stopListening() {
-        mRecognizer.stopListening();
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
-        mRecognizer.cancel();
-        mRecognizer.destroy();
-
-        doUnbindService();
-
-        mAssistant.shutdown();
+        this.blindAssistantService.shutdown();
+        this.doUnbindService();
     }
 
-    private enum VoiceStatus {
-        READY,
-        BEGINNING,
-        FINISHED,
-        ERROR,
-        RESULTS
-    }
 
-    private void showStatus(VoiceStatus status) {
+    private void showStatus(SpeechRecognizerUtil.VoiceStatus status) {
         showStatus(status, null);
     }
 
-    private void showStatus(VoiceStatus status, Object parameter) {
+    private void showStatus(SpeechRecognizerUtil.VoiceStatus status, Object parameter) {
         boolean showOnButton = true;
-
         CharSequence statusMsg = getText(R.string.voice_status_none);
 
         switch (status) {
@@ -155,8 +120,8 @@ public class VoicePromptActivity extends Activity {
             case ERROR:
                 int err = ((Integer) parameter).intValue();
 
-                String errorName = getErrorName(err);
-                String errorDescription = describeVoiceError(err);
+                String errorName = SpeechRecognizerUtil.getErrorName(err);
+                String errorDescription = SpeechRecognizerUtil.describeError(this, err);
 
                 statusMsg = String.format(
                         getText(R.string.voice_status_error).toString(),
@@ -165,9 +130,6 @@ public class VoicePromptActivity extends Activity {
                 );
 
                 showOnButton = false;
-
-                mAssistant.say("Your request failed because " + errorDescription);
-                mRecognizer.cancel();
 
                 break;
             case RESULTS:
@@ -194,99 +156,18 @@ public class VoicePromptActivity extends Activity {
         this.mStatus.setText(statusMsg);
     }
 
-    private String getErrorName(int error) {
-        String desc;
-
-        switch (error) {
-            case SpeechRecognizer.ERROR_AUDIO:
-                desc = "ERROR_AUDIO";
-                break;
-            case SpeechRecognizer.ERROR_CLIENT:
-                desc = "ERROR_CLIENT";
-                break;
-            case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
-                desc = "ERROR_INSUFFICIENT_PERMISSIONS";
-                break;
-            case SpeechRecognizer.ERROR_NETWORK:
-                desc = "ERROR_NETWORK";
-                break;
-            case SpeechRecognizer.ERROR_NETWORK_TIMEOUT:
-                desc = "ERROR_NETWORK_TIMEOUT";
-                break;
-            case SpeechRecognizer.ERROR_NO_MATCH:
-                desc = "ERROR_NO_MATCH";
-                break;
-            case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
-                desc = "ERROR_RECOGNIZER_BUSY";
-                break;
-            case SpeechRecognizer.ERROR_SERVER:
-                desc = "ERROR_SERVER";
-                break;
-            case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
-                desc = "ERROR_SPEECH_TIMEOUT";
-                break;
-            default:
-                desc = "ERROR_UNKNOWN";
-        }
-
-        return desc;
-    }
-
-    private String describeVoiceError(int error) {
-        int key = R.string.voice_err_unk;
-
-        switch (error) {
-            case SpeechRecognizer.ERROR_AUDIO:
-                key = R.string.voice_err_audio;
-                break;
-            case SpeechRecognizer.ERROR_CLIENT:
-                key = R.string.voice_err_client;
-                break;
-            case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
-                key = R.string.voice_err_insufficient_permissions;
-                break;
-            case SpeechRecognizer.ERROR_NETWORK:
-                key = R.string.voice_err_network;
-                break;
-            case SpeechRecognizer.ERROR_NETWORK_TIMEOUT:
-                key = R.string.voice_err_network_timeout;
-                break;
-            case SpeechRecognizer.ERROR_NO_MATCH:
-                key = R.string.voice_err_no_match;
-                break;
-            case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
-                key = R.string.voice_err_recognizer_busy;
-                break;
-            case SpeechRecognizer.ERROR_SERVER:
-                key = R.string.voice_err_server;
-                break;
-            case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
-                key = R.string.voice_err_speech_timeout;
-                break;
-            default:
-                key = R.string.voice_err_unk;
-        }
-
-        return getString(key);
-    }
-
-    private CharSequence voiceResultsToSentence(ArrayList<String> results, float[] confidence) {
-        final float MINIMUM_CONFIDENCE = 0.70f;
-        return results.get(0);
-    }
-
     private class VoiceRecognitionListener implements RecognitionListener {
 
         @Override
         public void onReadyForSpeech(Bundle bundle) {
-            showStatus(VoiceStatus.READY);
+            showStatus(SpeechRecognizerUtil.VoiceStatus.READY);
         }
 
         @Override
         public void onBeginningOfSpeech() {
             Log.d(TAG, "Speech recording has begun");
 
-            showStatus(VoiceStatus.BEGINNING);
+            showStatus(SpeechRecognizerUtil.VoiceStatus.BEGINNING);
         }
 
         @Override
@@ -301,14 +182,14 @@ public class VoicePromptActivity extends Activity {
         public void onEndOfSpeech() {
             Log.d(TAG, "The user has stopped talking");
 
-            showStatus(VoiceStatus.FINISHED);
+            showStatus(SpeechRecognizerUtil.VoiceStatus.FINISHED);
         }
 
         @Override
         public void onError(int i) {
             Log.e(TAG, "An error has occured " + i);
 
-            showStatus(VoiceStatus.ERROR, i);
+            showStatus(SpeechRecognizerUtil.VoiceStatus.ERROR, i);
         }
 
         @Override
@@ -316,12 +197,9 @@ public class VoicePromptActivity extends Activity {
             Log.d(TAG, "Speech results are now available");
 
             ArrayList<String> results = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-            float[] confidence = bundle.getFloatArray(SpeechRecognizer.CONFIDENCE_SCORES);
+            String bestResult = results.get(0);
 
-            String bestResult = voiceResultsToSentence(results, confidence).toString();
-            showStatus(VoiceStatus.RESULTS, bestResult);
-
-            mAssistant.assist(bestResult);
+            showStatus(SpeechRecognizerUtil.VoiceStatus.RESULTS, String.format("%s", bestResult));
         }
 
         @Override
@@ -333,16 +211,12 @@ public class VoicePromptActivity extends Activity {
         public void onEvent(int i, Bundle bundle) {
             //To change body of implemented methods use File | Settings | File Templates.
         }
-
-
     }
-
-    private BlindAssistantService blindAssistantService;
-    private boolean blindAssistantServiceBounded;
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             blindAssistantService = ((BlindAssistantService.BlindAssistantBinder) service).getService();
+            blindAssistantService.setRecognitionListener(new VoiceRecognitionListener());
         }
 
         public void onServiceDisconnected(ComponentName className) {

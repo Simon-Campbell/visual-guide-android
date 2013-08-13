@@ -226,6 +226,7 @@ public class VoicePromptActivity extends Activity {
 
     private void doBindService() {
         bindService(new Intent(this, BlindAssistantService.class), serviceConnection, Context.BIND_AUTO_CREATE);
+
         blindAssistantServiceBounded = true;
     }
 

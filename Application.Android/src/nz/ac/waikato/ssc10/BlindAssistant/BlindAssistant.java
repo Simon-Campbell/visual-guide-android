@@ -33,6 +33,7 @@ public class BlindAssistant implements NavigatorUpdateListener {
     private static final String TAG = "BlindAssistant";
 
     private VoiceMethodFactory voiceMethodFactory;
+    private Location lastLocation;
     private Context context;
     private TextToSpeech tts;
 
@@ -73,9 +74,16 @@ public class BlindAssistant implements NavigatorUpdateListener {
         }
 
         if (destination != null) {
-            final String from = getCurrentLocationName();
-            final String to = destination + " New Zealand";
+            final Location location = getCurrentLocation();
+            final String from;
 
+            if (location != null) {
+                from = String.format("%f,%f", location.getLatitude(), location.getLongitude());
+            } else {
+                from = getCurrentLocationName();
+            }
+
+            final String to = destination + " New Zealand";
             say("getting directions to " + destination);
 
             WalkingDirectionsTask task = new WalkingDirectionsTask();
@@ -136,6 +144,14 @@ public class BlindAssistant implements NavigatorUpdateListener {
             }
         } finally {
         }
+    }
+
+    private Location getCurrentLocation() {
+        if (navigator != null) {
+            return navigator.getLastLocation();
+        }
+
+        return null;
     }
 
     public String getCurrentLocationName() {

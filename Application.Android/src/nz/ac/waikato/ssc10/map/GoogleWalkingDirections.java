@@ -1,5 +1,6 @@
 package nz.ac.waikato.ssc10.map;
 
+import android.location.Location;
 import nz.ac.waikato.ssc10.navigation.NavigationStep;
 import nz.ac.waikato.ssc10.navigation.TimedNavigationStep;
 import org.apache.http.HttpResponse;
@@ -34,6 +35,13 @@ public class GoogleWalkingDirections implements WalkingDirections {
 
     private static final String API_MODE_PARAM = "mode";
 
+    public GoogleWalkingDirections(Location startLocation, String endAddress) throws NoSuchRouteException {
+        this.startAddress = String.format("%f,%f", startLocation.getLatitude(), startLocation.getLatitude());
+        this.endAddress = endAddress;
+
+        this.update();
+    }
+
     public GoogleWalkingDirections(String startAddress, String endAddress) throws NoSuchRouteException {
         this.startAddress = startAddress;
         this.endAddress = endAddress;
@@ -41,7 +49,7 @@ public class GoogleWalkingDirections implements WalkingDirections {
         this.update();
     }
 
-    private static String getDirections(String to, String from) throws IOException {
+    private static String getDirections(String from, String to) throws IOException {
         List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
         params.add(new BasicNameValuePair(API_ORIGIN_PARAM, from));
         params.add(new BasicNameValuePair(API_DEST_PARAM, to));

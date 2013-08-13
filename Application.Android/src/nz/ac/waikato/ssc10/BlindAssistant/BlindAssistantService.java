@@ -83,7 +83,12 @@ public class BlindAssistantService extends Service {
 
     @Override
     public void onDestroy() {
-        notificationManager.cancel(NOTIFICATION);
+        stopForeground(true);
+
+        mRecognizer.cancel();
+        mRecognizer.destroy();
+
+        mAssistant.shutdown();
     }
 
     @Override
@@ -107,14 +112,11 @@ public class BlindAssistantService extends Service {
                 .setContentIntent(contentIntent)
                 .build();
 
-        notificationManager.notify(NOTIFICATION, notification);
+        startForeground(NOTIFICATION, notification);
     }
 
     public void shutdown() {
-        mRecognizer.cancel();
-        mRecognizer.destroy();
-
-        mAssistant.shutdown();
+        this.stopSelf();
     }
 
     private class ServiceRecognitionListener implements RecognitionListener {
@@ -156,6 +158,9 @@ public class BlindAssistantService extends Service {
 
         @Override
         public void onError(int i) {
+            sayStatus(SpeechRecognizerUtil.VoiceStatus.ERROR, i);
+            mRecognizer.cancel();
+
             if (mRecognitionListener != null) {
                 mRecognitionListener.onError(i);
             }
@@ -186,14 +191,12 @@ public class BlindAssistantService extends Service {
         }
     }
 
-    private void showStatus(SpeechRecognizerUtil.VoiceStatus status, Object parameter) {
+    private void sayStatus(SpeechRecognizerUtil.VoiceStatus status, Object parameter) {
         switch (status) {
             case ERROR:
                 int err = ((Integer) parameter).intValue();
                 String errorDescription = SpeechRecognizerUtil.describeError(this, err);
-
                 mAssistant.say("Your request failed because " + errorDescription);
-                mRecognizer.cancel();
 
                 break;
         }

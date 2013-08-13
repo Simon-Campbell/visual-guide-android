@@ -101,7 +101,11 @@ public class BlindAssistant implements NavigatorUpdateListener {
 
     @Override
     public void onNavigationStepChange(IncrementalNavigator guide, NavigationStep step) {
-        sayInstruction(guide.getCurrentInstruction());
+        if (step != null) {
+            sayInstruction(guide.getCurrentInstruction());
+        } else {
+            say("you have arrived at your destination");
+        }
     }
 
     private class WalkingDirectionsTask extends AsyncTask<String, Double, WalkingDirections> {

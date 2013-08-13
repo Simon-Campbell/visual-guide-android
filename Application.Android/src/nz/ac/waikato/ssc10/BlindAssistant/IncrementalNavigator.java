@@ -21,6 +21,7 @@ import java.util.concurrent.ArrayBlockingQueue;
  * To change this template use File | Settings | File Templates.
  */
 public class IncrementalNavigator {
+    public static final double UPDATE_DISTANCE_THRESHOLD = 10.0;
     private static String TAG = "IncrementalNavigator";
 
     private int currentIdx = 0;
@@ -33,17 +34,48 @@ public class IncrementalNavigator {
     private LocationRequest locationRequest;
 
     private WalkingDirections walkingDirections;
-
     private LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
             Log.d(TAG, "The location has changed to " + location.toString());
 
             if (navigatorUpdateListener != null && walkingDirections != null) {
-                navigatorUpdateListener.onNavigationStepChange(IncrementalNavigator.this, walkingDirections.getSteps().get(currentIdx));
+                List<NavigationStep> steps = walkingDirections.getSteps();
+
+                NavigationStep current = steps.get(currentIdx);
+                NavigationStep next = currentIdx + 1 < steps.size() ? steps.get(currentIdx + 1) : null;
+
+                if (current != null) {
+                    float[] results = new float[2];
+
+                    LatLng latLng = current.getEndLocation();
+                    Location.distanceBetween(location.getLatitude(), location.getLongitude(), latLng.getLatitude(), latLng.getLongitude(), results);
+
+                    if (results[0] < UPDATE_DISTANCE_THRESHOLD) {
+                        currentIdx++;
+
+                        navigatorUpdateListener.onNavigationStepChange(IncrementalNavigator.this, next);
+
+                        // If we have no more steps to get to then,
+                        // we'll kill the updates.
+
+                        // TODO: Make sure that no more updates happen after
+                        // this.
+                        if (next == null) {
+                            locationClient.removeLocationUpdates(locationListener);
+                        }
+                    }
+                }
+
             }
 
-            movementHistory.add(location);
+            // Offer the location to the history queue, if
+            // it fails then try removing the head and then
+            // adding it.
+            if (!movementHistory.offer(location)) {
+                movementHistory.remove();
+                movementHistory.add(location);
+            }
         }
     };
 
@@ -73,6 +105,10 @@ public class IncrementalNavigator {
         this.walkingDirections = walkingDirections;
 
         if (walkingDirections != null) {
+            if (navigatorUpdateListener != null) {
+                navigatorUpdateListener.onNavigationStepChange(this, walkingDirections.getSteps().get(0));
+            }
+
             this.locationClient.requestLocationUpdates(locationRequest, locationListener);
         } else {
             this.locationClient.removeLocationUpdates(locationListener);

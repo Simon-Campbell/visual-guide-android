@@ -70,11 +70,16 @@ public class PlaceholderMapStringTemplate {
         // If we have not consumed the whole string there must be
         // pattern at the end. Let's extract it and put it in the
         // key map.
-        if (lastIndex != concrete.length()) {
-            keyMap.put(keys.get(keys.size() - 1), concrete.substring(lastIndex));
+        if (keys.size() >= literalMatches) {
+            keyMap.put(keys.get(literalMatches - 1), concrete.substring(lastIndex));
+
+            // We have consumed the last text as a key, this may or may not be right:
+            //  The 'literalMatches' variable will be checked against the
+            //  constants array length to ensure correctness.
+            lastIndex = concrete.length();
         }
 
-        if ((literalMatches - constants.length) == 0) {
+        if ((literalMatches - constants.length) == 0 && (lastIndex == concrete.length())) {
             return keyMap;
         } else {
             return null;

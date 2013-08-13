@@ -12,6 +12,7 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
+import nz.ac.waikato.ssc10.util.SpeechRecognizerUtil;
 
 import java.util.ArrayList;
 

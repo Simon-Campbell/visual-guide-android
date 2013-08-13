@@ -46,4 +46,21 @@ public class PlaceholderMapStringTemplateTest {
         assertTrue("which is".equals(variables.get("{two}")));
         assertTrue("80!".equals(variables.get("{three}")));
     }
+
+    @Test
+    public void testVariables_OnePlaceholder() {
+        Map<String, String> variables =
+                new PlaceholderMapStringTemplate("take me to {Place}")
+                        .variables("take me to silverdale road");
+
+        assertTrue(variables.get("{Place}").equals("silverdale road"));
+    }
+
+    @Test
+    public void test_ConcreteContainsConstPattern() {
+        PlaceholderMapStringTemplate t1 = new PlaceholderMapStringTemplate("where am I");
+
+        // Not a match so there should be no variables collection!
+        assertTrue(t1.variables("where am I facing") == null);
+    }
 }

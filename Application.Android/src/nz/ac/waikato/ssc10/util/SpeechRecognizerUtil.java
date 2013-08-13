@@ -1,7 +1,8 @@
-package nz.ac.waikato.ssc10.BlindAssistant;
+package nz.ac.waikato.ssc10.util;
 
 import android.content.Context;
 import android.speech.SpeechRecognizer;
+import nz.ac.waikato.ssc10.BlindAssistant.R;
 
 /**
  * Created with IntelliJ IDEA.

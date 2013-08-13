@@ -108,6 +108,30 @@ public class BlindAssistant implements NavigatorUpdateListener {
         }
     }
 
+    public void sayUserCompassDirection() {
+        final float bearing = getCurrentLocation().getBearing();
+        String compassDirection;
+
+        if (bearing > 337.5 || bearing <= 22.5)
+            compassDirection = "north";
+        else if (bearing > 22.5 && bearing <= 67.5)
+            compassDirection = "north east";
+        else if (bearing > 67.5 && bearing <= 112.5)
+            compassDirection = "east";
+        else if (bearing > 112.5 && bearing <= 157.5)
+            compassDirection = "south east";
+        else if (bearing > 157.5 && bearing <= 202.5)
+            compassDirection = "south";
+        else if (bearing > 202.5 && bearing <= 247.5)
+            compassDirection = "south west";
+        else if (bearing > 247.5 && bearing <= 292.5)
+            compassDirection = "west";
+        else
+            compassDirection = "north west";
+
+        say(String.format("you are facing %s", compassDirection));
+    }
+
     private class WalkingDirectionsTask extends AsyncTask<String, Double, WalkingDirections> {
 
         @Override

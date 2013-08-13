@@ -33,23 +33,28 @@ public class VoiceMethodFactory {
             assistant.sayCurrentLocation();
         }
     };
-
     private VoiceMethod stopNavigating = new VoiceMethod() {
         @Override
         public void invoke(BlindAssistant assistant, Map<String, String> arguments) {
             assistant.navigateTo(null);
         }
     };
-
     private VoiceMethod navigateUser = new VoiceMethod() {
         @Override
         public void invoke(BlindAssistant assistant, Map<String, String> arguments) {
             assistant.navigateTo(arguments.get("{Destination}"));
         }
     };
+    private VoiceMethod sayCompassDirection = new VoiceMethod() {
+        @Override
+        public void invoke(BlindAssistant assistant, Map<String, String> arguments) {
+            assistant.sayUserCompassDirection();
+        }
+    };
 
     private VoiceMethodFactory() {
         voiceMethods.put("where am I", sayUserLocation);
+        voiceMethods.put("where am I facing", sayCompassDirection);
 
         voiceMethods.put("take me to {Destination}", navigateUser);
         voiceMethods.put("navigate to {Destination}", navigateUser);

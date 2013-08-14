@@ -1,6 +1,5 @@
 package nz.ac.waikato.ssc10.navigation;
 
-import nz.ac.waikato.ssc10.BlindAssistant.GpsCoordinate;
 import nz.ac.waikato.ssc10.map.LatLng;
 
 /**

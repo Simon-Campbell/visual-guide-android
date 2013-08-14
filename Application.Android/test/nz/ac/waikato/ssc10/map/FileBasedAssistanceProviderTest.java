@@ -1,14 +1,10 @@
 package nz.ac.waikato.ssc10.map;
 
-import nz.ac.waikato.ssc10.BlindAssistant.GpsCoordinate;
 import nz.ac.waikato.ssc10.navigation.NavigationStep;
-
-import java.net.URI;
 
 import nz.ac.waikato.ssc10.navigation.PedestrianCrossing;
 import org.junit.Test;
 
-import java.net.URL;
 import java.util.List;
 
 import static org.junit.Assert.assertFalse;

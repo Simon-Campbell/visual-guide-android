@@ -1,6 +1,7 @@
 package nz.ac.waikato.ssc10.BlindAssistant;
 
 import android.content.Context;
+import android.hardware.SensorManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -14,6 +15,7 @@ import com.google.android.gms.location.LocationClient;
 import nz.ac.waikato.ssc10.map.GoogleWalkingDirections;
 import nz.ac.waikato.ssc10.map.NoSuchRouteException;
 import nz.ac.waikato.ssc10.map.WalkingDirections;
+import nz.ac.waikato.ssc10.navigation.CompassProvider;
 import nz.ac.waikato.ssc10.navigation.NavigationStep;
 import org.javatuples.Pair;
 
@@ -109,27 +111,14 @@ public class BlindAssistant implements NavigatorUpdateListener {
     }
 
     public void sayUserCompassDirection() {
-        final float bearing = getCurrentLocation().getBearing();
-        String compassDirection;
+        if (navigator != null) {
+            final double bearing = navigator.getLastFacingBearing();
 
-        if (bearing > 337.5 || bearing <= 22.5)
-            compassDirection = "north";
-        else if (bearing > 22.5 && bearing <= 67.5)
-            compassDirection = "north east";
-        else if (bearing > 67.5 && bearing <= 112.5)
-            compassDirection = "east";
-        else if (bearing > 112.5 && bearing <= 157.5)
-            compassDirection = "south east";
-        else if (bearing > 157.5 && bearing <= 202.5)
-            compassDirection = "south";
-        else if (bearing > 202.5 && bearing <= 247.5)
-            compassDirection = "south west";
-        else if (bearing > 247.5 && bearing <= 292.5)
-            compassDirection = "west";
-        else
-            compassDirection = "north west";
+            say(String.format("you are facing %s", CompassProvider.getCardinalFacingDirection(bearing)));
+        } else {
+            say("your heading direction is unknown");
+        }
 
-        say(String.format("you are facing %s", compassDirection));
     }
 
     private class WalkingDirectionsTask extends AsyncTask<String, Double, WalkingDirections> {
@@ -241,7 +230,10 @@ public class BlindAssistant implements NavigatorUpdateListener {
         public void onConnected(Bundle bundle) {
             say("the application has connected to the location service");
 
-            navigator = new IncrementalNavigator(locationClient);
+            SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+            CompassProvider compassProvider = new CompassProvider(sensorManager);
+
+            navigator = new IncrementalNavigator(locationClient, compassProvider);
             navigator.setNavigatorUpdateListener(BlindAssistant.this);
         }
 

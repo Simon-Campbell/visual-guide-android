@@ -7,6 +7,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import nz.ac.waikato.ssc10.map.LatLng;
 import nz.ac.waikato.ssc10.map.WalkingDirections;
+import nz.ac.waikato.ssc10.navigation.CompassProvider;
 import nz.ac.waikato.ssc10.navigation.NavigationStep;
 
 import java.util.List;
@@ -25,19 +26,26 @@ public class IncrementalNavigator {
     private static String TAG = "IncrementalNavigator";
 
     private int currentIdx = 0;
-    private float headingBearing = 0.0f;
+
+    private double headingBearing = 0.0;
+    private double facingBearing = 0.0;
 
     private Queue<Location> movementHistory;
     private NavigatorUpdateListener navigatorUpdateListener;
 
     private LocationClient locationClient;
     private LocationRequest locationRequest;
+    private CompassProvider compassProvider;
 
     private WalkingDirections walkingDirections;
     private LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
             Log.d(TAG, "The location has changed to " + location.toString());
+
+            if (location.hasBearing()) {
+                headingBearing = location.getBearing();
+            }
 
             if (navigatorUpdateListener != null && walkingDirections != null) {
                 List<NavigationStep> steps = walkingDirections.getSteps();
@@ -79,17 +87,34 @@ public class IncrementalNavigator {
         }
     };
 
-    public IncrementalNavigator(LocationClient locationClient) {
+    private CompassProvider.CompassChangedListener compassChangedListener = new CompassProvider.CompassChangedListener() {
+        @Override
+        public void onCompassBearingChanged(double oldBearing, double newBearing) {
+            facingBearing = newBearing;
+        }
+    };
+
+
+    public IncrementalNavigator(LocationClient locationClient, CompassProvider compassProvider) {
+        this.compassProvider = compassProvider;
+        this.compassProvider.setCompassChangedListener(compassChangedListener);
+
+        this.facingBearing = compassProvider.getBearing();
+
         this.locationRequest = LocationRequest.create();
         this.locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         this.locationRequest.setInterval(5000);
         this.locationRequest.setFastestInterval(1000);
+
         this.locationClient = locationClient;
-        this.headingBearing = locationClient
-                .getLastLocation()
-                .getBearing();
+
+        this.headingBearing = locationClient.getLastLocation().getBearing();
 
         this.movementHistory = new ArrayBlockingQueue<Location>(128);
+    }
+
+    public double getLastFacingBearing() {
+        return this.facingBearing;
     }
 
     public void setNavigatorUpdateListener(NavigatorUpdateListener listener) {

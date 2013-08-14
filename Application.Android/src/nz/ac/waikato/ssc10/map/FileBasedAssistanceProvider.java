@@ -1,9 +1,7 @@
 package nz.ac.waikato.ssc10.map;
 
-import nz.ac.waikato.ssc10.BlindAssistant.GpsCoordinate;
 import nz.ac.waikato.ssc10.navigation.NavigationStep;
 import nz.ac.waikato.ssc10.navigation.PedestrianCrossing;
-import nz.ac.waikato.ssc10.navigation.TimedNavigationStep;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

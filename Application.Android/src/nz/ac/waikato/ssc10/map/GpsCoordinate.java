@@ -1,4 +1,4 @@
-package nz.ac.waikato.ssc10.BlindAssistant;
+package nz.ac.waikato.ssc10.map;
 
 import nz.ac.waikato.ssc10.map.LatLng;
 

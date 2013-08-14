@@ -1,7 +1,5 @@
 package nz.ac.waikato.ssc10.map;
 
-import nz.ac.waikato.ssc10.BlindAssistant.GpsCoordinate;
-
 import java.util.ArrayList;
 import java.util.List;
 

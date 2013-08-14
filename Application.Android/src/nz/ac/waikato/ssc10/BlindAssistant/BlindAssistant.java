@@ -98,7 +98,23 @@ public class BlindAssistant implements NavigatorUpdateListener {
     }
 
     @Override
-    public void onNavigationPathChange(IncrementalNavigator guide) {
+    public void onPathUpdated(IncrementalNavigator navigator, List<NavigationStep> newSteps, List<NavigationStep> oldSteps, NavigationStep oldStep) {
+        say("the path was updated");
+    }
+
+
+    private long lastLookAwayWarning = 0;
+
+    @Override
+    public void onMoveFromPath(IncrementalNavigator guide, double bearingTo) {
+        long now = System.currentTimeMillis();
+        final long WARNING_THRESHOLD = 7500;
+
+        if ((now - lastLookAwayWarning) > WARNING_THRESHOLD) {
+            lastLookAwayWarning = now;
+
+            say("you are moving away from the next destination");
+        }
     }
 
     @Override

@@ -15,20 +15,38 @@ import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 
 /**
- * Created with IntelliJ IDEA.
- * User: Simon
- * Date: 10/07/13
- * Time: 11:57 AM
- * To change this template use File | Settings | File Templates.
+ * This class listens to a location provider and checks it against a defined
+ * route. Other classes can listen in for the events of the navigator and request
+ * information about the navigation.
  */
 public class IncrementalNavigator {
     public static final double UPDATE_DISTANCE_THRESHOLD = 10.0;
+    public static final double PATH_BEARING_THRESH_DEG = 90.0;
     private static String TAG = "IncrementalNavigator";
 
     private int currentIdx = 0;
 
+    /**
+     * The bearing that the phone is heading
+     */
     private double headingBearing = 0.0;
+
+    /**
+     * The bearing that the phone is facing
+     */
     private double facingBearing = 0.0;
+
+    /**
+     * The last calculated distance from the persons location to
+     * the next destination.
+     */
+    private double nextDestinationLength = 0.0;
+
+    /**
+     * The last calculated 'initial' bearing from the persons location
+     * to the next destination.
+     */
+    private double nextDestinationBearing = 0.0;
 
     private Queue<Location> movementHistory;
     private NavigatorUpdateListener navigatorUpdateListener;
@@ -55,9 +73,8 @@ public class IncrementalNavigator {
 
                 if (current != null) {
                     float[] results = new float[2];
-
-                    LatLng latLng = current.getEndLocation();
-                    Location.distanceBetween(location.getLatitude(), location.getLongitude(), latLng.getLatitude(), latLng.getLongitude(), results);
+                    LatLng endLatLng = current.getEndLocation();
+                    Location.distanceBetween(location.getLatitude(), location.getLongitude(), endLatLng.getLatitude(), endLatLng.getLongitude(), results);
 
                     if (results[0] < UPDATE_DISTANCE_THRESHOLD) {
                         currentIdx++;
@@ -72,6 +89,13 @@ public class IncrementalNavigator {
                         if (next == null) {
                             locationClient.removeLocationUpdates(locationListener);
                         }
+                    }
+
+                    double bearingTo = Math.toDegrees(results[1]);
+                    Log.i(TAG, "The bearing between " + location + " vs. " + endLatLng + " is " + bearingTo + " degrees");
+
+                    if (bearingTo < -PATH_BEARING_THRESH_DEG && bearingTo > PATH_BEARING_THRESH_DEG) {
+                        navigatorUpdateListener.onMoveFromPath(IncrementalNavigator.this, bearingTo);
                     }
                 }
 
@@ -127,6 +151,9 @@ public class IncrementalNavigator {
     }
 
     public void setWalkingDirections(WalkingDirections walkingDirections) {
+        // The method assumes that by setting the walking directions object you are
+        // starting from the beginning.
+        this.currentIdx = 0;
         this.walkingDirections = walkingDirections;
 
         if (walkingDirections != null) {

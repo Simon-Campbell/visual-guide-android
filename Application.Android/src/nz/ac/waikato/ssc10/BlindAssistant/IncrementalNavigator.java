@@ -89,7 +89,7 @@ public class IncrementalNavigator {
                     double bearingTo = Math.toDegrees(results[1]);
                     Log.i(TAG, "The bearing between " + location + " vs. " + endLatLng + " is " + bearingTo + " degrees");
 
-                    if (bearingTo < -PATH_BEARING_THRESH_DEG && bearingTo > PATH_BEARING_THRESH_DEG) {
+                    if (bearingTo < -PATH_BEARING_THRESH_DEG || bearingTo > PATH_BEARING_THRESH_DEG) {
                         navigatorUpdateListener.onMoveFromPath(IncrementalNavigator.this, bearingTo);
                     }
                 }

@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.speech.RecognitionListener;
@@ -41,6 +42,9 @@ public class VoicePromptActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.voice_prompt);
 
+        AudioManager audioManager = ((AudioManager) getSystemService(AUDIO_SERVICE));
+        audioManager.registerMediaButtonEventReceiver(new ComponentName(this, MediaButtonIntentReceiver.class));
+
         this.doBindService();
 
         mButton = (Button) findViewById(R.id.request_assist_button);
@@ -76,19 +80,19 @@ public class VoicePromptActivity extends Activity {
         googlePlayServices = isGooglePlayServicesAvailable(this);
     }
 
-    @Override
-    // TODO: implement MediaIntentReceiver in BlindAssistantService
-    //  http://stackoverflow.com/a/11510564/350724
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        Log.i(TAG, "onKeyDown -> keyCode = " + keyCode);
-
-        if (keyCode == KeyEvent.KEYCODE_HEADSETHOOK) {
-            blindAssistantService.listen();
-            return true;
-        }
-
-        return super.onKeyDown(keyCode, event);
-    }
+//    @Override
+//    // TODO: implement MediaIntentReceiver in BlindAssistantService
+//    //  http://stackoverflow.com/a/11510564/350724
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        Log.i(TAG, "onKeyDown -> keyCode = " + keyCode);
+//
+//        if (keyCode == KeyEvent.KEYCODE_HEADSETHOOK) {
+//            blindAssistantService.listen();
+//            return true;
+//        }
+//
+//        return super.onKeyDown(keyCode, event);
+//    }
 
     @Override
     protected void onDestroy() {

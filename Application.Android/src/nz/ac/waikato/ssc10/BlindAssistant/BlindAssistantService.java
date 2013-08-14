@@ -25,6 +25,10 @@ public class BlindAssistantService extends Service {
     private static final String TAG = "BlindAssistantService";
     private static final int NOTIFICATION = 0xdeadbeef;
 
+    public static final String ACTION_START_LISTEN = "blind_assist_svc://action_listen";
+    public static final String ACTION_SAY_TEXT = "blind_assist_svc://action_say_text";
+    public static final String EXTRA_SAY_TEXT = "extra_say_text";
+
     private BlindAssistant mAssistant;
     private SpeechRecognizer mRecognizer;
     private RecognitionListener mRecognitionListener;
@@ -76,6 +80,12 @@ public class BlindAssistantService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "Received start id " + startId + ": " + intent);
+
+        if (ACTION_START_LISTEN.equals(intent.getAction())) {
+            listen();
+        } else if (ACTION_SAY_TEXT.equals(intent.getAction())) {
+            say("this feature is not implemented");
+        }
 
         // We want this service to continue running until it is explicitly
         // stopped, so return sticky.

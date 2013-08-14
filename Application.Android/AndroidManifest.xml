@@ -25,5 +25,10 @@
         </activity>
 
         <service android:name=".BlindAssistantService"/>
+        <receiver android:name=".MediaButtonIntentReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON"/>
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

@@ -32,11 +32,6 @@ public class IncrementalNavigator {
     private double headingBearing = 0.0;
 
     /**
-     * The bearing that the phone is facing
-     */
-    private double facingBearing = 0.0;
-
-    /**
      * The last calculated distance from the persons location to
      * the next destination.
      */
@@ -111,19 +106,8 @@ public class IncrementalNavigator {
         }
     };
 
-    private CompassProvider.CompassChangedListener compassChangedListener = new CompassProvider.CompassChangedListener() {
-        @Override
-        public void onCompassBearingChanged(double oldBearing, double newBearing) {
-            facingBearing = newBearing;
-        }
-    };
-
-
     public IncrementalNavigator(LocationClient locationClient, CompassProvider compassProvider) {
         this.compassProvider = compassProvider;
-        this.compassProvider.setCompassChangedListener(compassChangedListener);
-
-        this.facingBearing = compassProvider.getBearing();
 
         this.locationRequest = LocationRequest.create();
         this.locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -138,7 +122,7 @@ public class IncrementalNavigator {
     }
 
     public double getLastFacingBearing() {
-        return this.facingBearing;
+        return compassProvider.getBearing();
     }
 
     public void setNavigatorUpdateListener(NavigatorUpdateListener listener) {
@@ -147,7 +131,6 @@ public class IncrementalNavigator {
 
     public void shutdown() {
         this.locationClient.removeLocationUpdates(locationListener);
-        this.locationClient.disconnect();
     }
 
     public void setWalkingDirections(WalkingDirections walkingDirections) {

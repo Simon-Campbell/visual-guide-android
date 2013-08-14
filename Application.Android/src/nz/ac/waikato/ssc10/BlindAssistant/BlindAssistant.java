@@ -41,6 +41,9 @@ public class BlindAssistant implements NavigatorUpdateListener {
 
     private boolean isNavigating = false;
 
+    private SensorManager sensorManager;
+    private CompassProvider compassProvider;
+
     private IncrementalNavigator navigator = null;
     private LocationClient locationClient = null;
 
@@ -49,6 +52,9 @@ public class BlindAssistant implements NavigatorUpdateListener {
 
         this.context = context;
         this.voiceMethodFactory = VoiceMethodFactory.createStandardFactory();
+
+        this.sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+        this.compassProvider = new CompassProvider(sensorManager);
 
         // We need to assist the user using a TTS listener!
         this.tts = new TextToSpeech(this.context, new TextToSpeechInitListener());
@@ -128,7 +134,7 @@ public class BlindAssistant implements NavigatorUpdateListener {
 
     public void sayUserCompassDirection() {
         if (navigator != null) {
-            final double bearing = navigator.getLastFacingBearing();
+            final double bearing = compassProvider.getBearing();
 
             say(String.format("you are facing %s", CompassProvider.getCardinalFacingDirection(bearing)));
         } else {
@@ -232,6 +238,7 @@ public class BlindAssistant implements NavigatorUpdateListener {
     public void shutdown() {
         tts.shutdown();
         navigator.shutdown();
+        compassProvider.shutdown();
     }
 
     private class TextToSpeechInitListener implements TextToSpeech.OnInitListener {
@@ -245,9 +252,6 @@ public class BlindAssistant implements NavigatorUpdateListener {
         @Override
         public void onConnected(Bundle bundle) {
             say("the application has connected to the location service");
-
-            SensorManager sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-            CompassProvider compassProvider = new CompassProvider(sensorManager);
 
             navigator = new IncrementalNavigator(locationClient, compassProvider);
             navigator.setNavigatorUpdateListener(BlindAssistant.this);

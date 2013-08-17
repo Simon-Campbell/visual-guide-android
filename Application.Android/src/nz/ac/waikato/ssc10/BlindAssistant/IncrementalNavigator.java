@@ -20,7 +20,6 @@ import java.util.concurrent.ArrayBlockingQueue;
  * information about the navigation.
  */
 public class IncrementalNavigator {
-    public static final double UPDATE_DISTANCE_THRESHOLD = 10.0;
     public static final double PATH_BEARING_THRESH_DEG = 90.0;
     private static String TAG = "IncrementalNavigator";
 
@@ -51,10 +50,20 @@ public class IncrementalNavigator {
     private CompassProvider compassProvider;
 
     private WalkingDirections walkingDirections;
+
     private LocationListener locationListener = new LocationListener() {
+        private Location anchorLocation = null;
+
+        private static final double MOVE_DISTANCE_THRESH = 2.5;
+        private static final double UPDATE_DISTANCE_THRESH = 10.0;
+
         @Override
         public void onLocationChanged(Location location) {
             Log.d(TAG, "The location has changed to " + location.toString());
+
+            if (anchorLocation == null) {
+                anchorLocation = location;
+            }
 
             if (location.hasBearing()) {
                 headingBearing = location.getBearing();
@@ -67,11 +76,10 @@ public class IncrementalNavigator {
                 NavigationStep next = currentIdx + 1 < steps.size() ? steps.get(currentIdx + 1) : null;
 
                 if (current != null) {
-                    float[] results = new float[2];
                     LatLng endLatLng = current.getEndLocation();
-                    Location.distanceBetween(location.getLatitude(), location.getLongitude(), endLatLng.getLatitude(), endLatLng.getLongitude(), results);
+                    final float distanceTo = getDistanceTo(location, endLatLng);
 
-                    if (results[0] < UPDATE_DISTANCE_THRESHOLD) {
+                    if (distanceTo < UPDATE_DISTANCE_THRESH) {
                         currentIdx++;
 
                         navigatorUpdateListener.onNavigationStepChange(IncrementalNavigator.this, next);
@@ -83,14 +91,19 @@ public class IncrementalNavigator {
                         // this.
                         if (next == null) {
                             locationClient.removeLocationUpdates(locationListener);
+
+                            anchorLocation = null;
                         }
                     }
 
-                    double bearingTo = Math.toDegrees(results[1]);
-                    Log.i(TAG, "The bearing between " + location + " vs. " + endLatLng + " is " + bearingTo + " degrees");
+                    float diff = getDistanceTo(anchorLocation, endLatLng) - distanceTo;
 
-                    if (bearingTo < -PATH_BEARING_THRESH_DEG || bearingTo > PATH_BEARING_THRESH_DEG) {
-                        navigatorUpdateListener.onMoveFromPath(IncrementalNavigator.this, bearingTo);
+                    if (diff > MOVE_DISTANCE_THRESH) {
+                        anchorLocation = location;
+                    } else if (diff < -MOVE_DISTANCE_THRESH) {
+                        anchorLocation = location;
+
+                        navigatorUpdateListener.onMoveFromPath(IncrementalNavigator.this, 0.0);
                     }
                 }
 
@@ -103,6 +116,12 @@ public class IncrementalNavigator {
                 movementHistory.remove();
                 movementHistory.add(location);
             }
+        }
+
+        private float getDistanceTo(Location from, LatLng to) {
+            float[] res = new float[1];
+            Location.distanceBetween(from.getLatitude(), from.getLongitude(), to.getLatitude(), to.getLongitude(), res);
+            return res[0];
         }
     };
 

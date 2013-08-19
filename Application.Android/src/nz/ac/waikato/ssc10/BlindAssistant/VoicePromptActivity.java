@@ -11,7 +11,6 @@ import android.os.IBinder;
 import android.speech.RecognitionListener;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -85,11 +84,6 @@ public class VoicePromptActivity extends Activity {
 //    //  http://stackoverflow.com/a/11510564/350724
 //    public boolean onKeyDown(int keyCode, KeyEvent event) {
 //        Log.i(TAG, "onKeyDown -> keyCode = " + keyCode);
-//
-//        if (keyCode == KeyEvent.KEYCODE_HEADSETHOOK) {
-//            blindAssistantService.listen();
-//            return true;
-//        }
 //
 //        return super.onKeyDown(keyCode, event);
 //    }

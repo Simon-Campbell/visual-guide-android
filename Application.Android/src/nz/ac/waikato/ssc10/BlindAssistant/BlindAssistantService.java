@@ -4,7 +4,9 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -12,6 +14,7 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
+import nz.ac.waikato.ssc10.input.BluetoothHeadsetUtils;
 import nz.ac.waikato.ssc10.util.SpeechRecognizerUtil;
 
 import java.util.ArrayList;
@@ -32,8 +35,11 @@ public class BlindAssistantService extends Service {
     private BlindAssistant mAssistant;
     private SpeechRecognizer mRecognizer;
     private RecognitionListener mRecognitionListener;
+    private BluetoothHelper mBluetoothHelper;
 
     private final IBinder binder = new BlindAssistantBinder();
+
+    private AudioManager audioManager;
     private NotificationManager notificationManager;
 
     public void setRecognitionListener(RecognitionListener recognitionListener) {
@@ -54,27 +60,47 @@ public class BlindAssistantService extends Service {
     @Override
     public void onCreate() {
         this.notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        this.audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+
         this.mAssistant = new BlindAssistant(this);
 
         this.mRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         this.mRecognizer.setRecognitionListener(new ServiceRecognitionListener());
 
+        this.mBluetoothHelper = new BluetoothHelper(this, this);
+
         // Display a notification about us starting.  We put an icon in the status bar.
         showNotification();
     }
 
-    public void listen() {
+    public void stopListening() {
+        mRecognizer.stopListening();
+    }
+
+    private Intent createListenIntent() {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
 
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, BlindAssistantService.this.getPackageName());
         intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
 
-        mRecognizer.startListening(intent);
+        return intent;
+    }
+
+    public void listen() {
+        // If the device does not support bluetooth then just start listening,
+        // otherwise we'll wait for the on
+        if (!this.mBluetoothHelper.start()) {
+            mRecognizer.startListening(createListenIntent());
+        }
     }
 
     public void say(String msg) {
-        this.mAssistant.say(msg);
+        if (mBluetoothHelper.isOnHeadsetSco()) {
+            this.mAssistant.say(msg);
+        } else {
+            this.mAssistant.sayOnHeadset("headset " + msg);
+        }
     }
 
     @Override
@@ -95,6 +121,8 @@ public class BlindAssistantService extends Service {
     @Override
     public void onDestroy() {
         stopForeground(true);
+
+        mBluetoothHelper.stop();
 
         mRecognizer.cancel();
         mRecognizer.destroy();
@@ -134,6 +162,8 @@ public class BlindAssistantService extends Service {
 
         @Override
         public void onReadyForSpeech(Bundle bundle) {
+            say("i am ready to assist you");
+
             if (mRecognitionListener != null) {
                 mRecognitionListener.onReadyForSpeech(bundle);
             }
@@ -170,6 +200,7 @@ public class BlindAssistantService extends Service {
         @Override
         public void onError(int i) {
             sayStatus(SpeechRecognizerUtil.VoiceStatus.ERROR, i);
+
             mRecognizer.cancel();
 
             if (mRecognitionListener != null) {
@@ -213,4 +244,35 @@ public class BlindAssistantService extends Service {
         }
     }
 
+    public class BluetoothHelper extends BluetoothHeadsetUtils {
+        private Context mContext;
+        private BlindAssistantService mService;
+
+        public BluetoothHelper(Context context, BlindAssistantService service) {
+            super(context);
+
+            mContext = context;
+            mService = service;
+        }
+
+        @Override
+        public void onScoAudioDisconnected() {
+            mService.stopListening();
+        }
+
+        @Override
+        public void onScoAudioConnected() {
+            mRecognizer.startListening(createListenIntent());
+        }
+
+        @Override
+        public void onHeadsetDisconnected() {
+
+        }
+
+        @Override
+        public void onHeadsetConnected() {
+
+        }
+    }
 }

@@ -5,6 +5,7 @@ import android.hardware.SensorManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
@@ -20,6 +21,7 @@ import nz.ac.waikato.ssc10.navigation.NavigationStep;
 import org.javatuples.Pair;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -229,6 +231,14 @@ public class BlindAssistant implements NavigatorUpdateListener {
 
     private static String expandThoroughfareSuffix(String thoroughfare) {
         return thoroughfare.replaceFirst("\\wRd$", "road");
+    }
+
+    public void sayOnHeadset(String text) {
+        HashMap<String, String> params = new HashMap<String, String>();
+
+        params.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(AudioManager.STREAM_VOICE_CALL));
+
+        tts.speak(text, TextToSpeech.QUEUE_FLUSH, params);
     }
 
     public void say(String text) {

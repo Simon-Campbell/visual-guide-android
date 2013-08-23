@@ -21,7 +21,7 @@
         android:icon="@drawable/icon"
         android:label="@string/app_name">
         <activity
-            android:name=".VoicePromptActivity"
+            android:name=".activities.VoicePromptActivity"
             android:screenOrientation="portrait"
             android:label="Voice Prompt">
             <intent-filter>
@@ -30,10 +30,10 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".BlindAssistantService"/>
-        <receiver android:name=".MediaButtonIntentReceiver">
+        <service android:name=".services.BlindAssistantService"/>
+
+        <receiver android:name=".receivers.MediaButtonIntentReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.CALL_BUTTON"/>
                 <action android:name="android.intent.action.MEDIA_BUTTON"/>
             </intent-filter>
         </receiver>

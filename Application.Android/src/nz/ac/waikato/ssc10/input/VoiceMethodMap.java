@@ -1,4 +1,4 @@
-package nz.ac.waikato.ssc10.BlindAssistant;
+package nz.ac.waikato.ssc10.input;
 
 import nz.ac.waikato.ssc10.text.PlaceholderMapStringTemplate;
 import org.javatuples.Pair;
@@ -9,11 +9,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created with IntelliJ IDEA.
- * User: Simon
- * Date: 3/08/13
- * Time: 5:14 PM
- * To change this template use File | Settings | File Templates.
+ * A map which contains maps string templates to voice methods, it also provides
+ * helper methods for building a voice method map.
  */
 public class VoiceMethodMap extends AbstractMap<PlaceholderMapStringTemplate, VoiceMethod> {
     private Map<PlaceholderMapStringTemplate, VoiceMethod> map;
@@ -31,6 +28,15 @@ public class VoiceMethodMap extends AbstractMap<PlaceholderMapStringTemplate, Vo
         return map.entrySet();
     }
 
+    /**
+     * Put an entry in the map by creating a PlaceholderMapStringTemplate using
+     * the key.
+     *
+     * @param key   The key to make a PlaceholderMapStringTemplate with, this will be used
+     *              to identify entries.
+     * @param value The value associated with the key
+     * @return The value that was put in
+     */
     public VoiceMethod put(String key, VoiceMethod value) {
         return map.put(new PlaceholderMapStringTemplate(key), value);
     }
@@ -45,6 +51,13 @@ public class VoiceMethodMap extends AbstractMap<PlaceholderMapStringTemplate, Vo
         return map.remove(key);
     }
 
+    /**
+     * Get a pair containing the voice method and the named arguments defined by
+     * the key from the concreteKey.
+     *
+     * @param concreteKey The concrete key which matches against a template
+     * @return A Pair containing a voice method and a named argument map
+     */
     public Pair<VoiceMethod, Map<String, String>> get(String concreteKey) {
         for (Entry<PlaceholderMapStringTemplate, VoiceMethod> entry : map.entrySet()) {
             Map<String, String> args = entry.getKey().variables(concreteKey);

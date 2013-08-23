@@ -1,6 +1,7 @@
-package nz.ac.waikato.ssc10.BlindAssistant;
+package nz.ac.waikato.ssc10.input;
 
 import android.util.Log;
+import nz.ac.waikato.ssc10.BlindAssistant.BlindAssistant;
 import nz.ac.waikato.ssc10.grammar.VoiceInputGrammarLexer;
 import nz.ac.waikato.ssc10.grammar.VoiceInputGrammarListener;
 import nz.ac.waikato.ssc10.grammar.VoiceInputGrammarParser;
@@ -39,22 +40,46 @@ public class VoiceMethodFactory {
             assistant.navigateTo(null);
         }
     };
+
     private VoiceMethod navigateUser = new VoiceMethod() {
         @Override
         public void invoke(BlindAssistant assistant, Map<String, String> arguments) {
             assistant.navigateTo(arguments.get("{Destination}"));
         }
     };
+
     private VoiceMethod sayCompassDirection = new VoiceMethod() {
         @Override
         public void invoke(BlindAssistant assistant, Map<String, String> arguments) {
             assistant.sayUserCompassDirection();
         }
     };
+    private VoiceMethod sayDistanceToNext = new VoiceMethod() {
+        @Override
+        public void invoke(BlindAssistant assistant, Map<String, String> arguments) {
+            assistant.say("say distance to next is not implemented");
+        }
+    };
+
+    private VoiceMethod sayDistanceToFinal = new VoiceMethod() {
+        @Override
+        public void invoke(BlindAssistant assistant, Map<String, String> arguments) {
+            assistant.say("say distance to final is not implemented");
+        }
+    };
 
     private VoiceMethodFactory() {
         voiceMethods.put("where am I", sayUserLocation);
+
+        voiceMethods.put("what is my compass direction", sayCompassDirection);
+        voiceMethods.put("what direction am I facing", sayCompassDirection);
         voiceMethods.put("where am I facing", sayCompassDirection);
+
+        // TODO: Implement sayDistanceToFinal properly
+        voiceMethods.put("how far away am I from the final destination", sayDistanceToFinal);
+
+        // TODO: Implement sayDistanceToNext properly
+        voiceMethods.put("how far away am I from the next destination", sayDistanceToNext);
 
         voiceMethods.put("take me to {Destination}", navigateUser);
         voiceMethods.put("navigate to {Destination}", navigateUser);

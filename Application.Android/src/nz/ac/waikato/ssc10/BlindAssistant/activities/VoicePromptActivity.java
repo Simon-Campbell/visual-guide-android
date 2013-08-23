@@ -1,4 +1,4 @@
-package nz.ac.waikato.ssc10.BlindAssistant;
+package nz.ac.waikato.ssc10.BlindAssistant.activities;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -16,6 +16,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import com.google.android.gms.common.ConnectionResult;
+import nz.ac.waikato.ssc10.BlindAssistant.R;
+import nz.ac.waikato.ssc10.BlindAssistant.receivers.MediaButtonIntentReceiver;
+import nz.ac.waikato.ssc10.BlindAssistant.services.BlindAssistantService;
 import nz.ac.waikato.ssc10.util.SpeechRecognizerUtil;
 
 import java.util.ArrayList;
@@ -55,7 +58,7 @@ public class VoicePromptActivity extends Activity {
                 switch (motionEvent.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         if (googlePlayServices == ConnectionResult.SUCCESS) {
-                            blindAssistantService.listen();
+                            blindAssistantService.startListening();
                         } else {
                             blindAssistantService.say("Google Play Services is not available");
                         }
@@ -78,15 +81,6 @@ public class VoicePromptActivity extends Activity {
 
         googlePlayServices = isGooglePlayServicesAvailable(this);
     }
-
-//    @Override
-//    // TODO: implement MediaIntentReceiver in BlindAssistantService
-//    //  http://stackoverflow.com/a/11510564/350724
-//    public boolean onKeyDown(int keyCode, KeyEvent event) {
-//        Log.i(TAG, "onKeyDown -> keyCode = " + keyCode);
-//
-//        return super.onKeyDown(keyCode, event);
-//    }
 
     @Override
     protected void onDestroy() {

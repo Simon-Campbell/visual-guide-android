@@ -20,7 +20,7 @@
 
     <Button
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/button_size"
         android:text="@string/request_assistance"
         android:id="@+id/request_assist_button"
         android:height="@dimen/button_size"

@@ -20,6 +20,7 @@ public class CompassProvider implements SensorEventListener {
 
     /**
      * Sets a listener object to listen for compass changed events
+     *
      * @param listener The object that will listen to when the compass
      *                 has changed
      */
@@ -29,6 +30,7 @@ public class CompassProvider implements SensorEventListener {
 
     /**
      * Creates a compass provider from the sensor manager
+     *
      * @param sensorManager The sensor manager that will be used to
      *                      provide the compass provider with device
      *                      sensor updates
@@ -42,6 +44,7 @@ public class CompassProvider implements SensorEventListener {
 
     /**
      * Returns if the compass provider has a bearing result
+     *
      * @return True if the compass provider has a bearing result, false otherwise
      */
     public boolean hasBearing() {
@@ -50,6 +53,7 @@ public class CompassProvider implements SensorEventListener {
 
     /**
      * Returns the compass bearing, if it does not exist then it returns 0.0
+     *
      * @return The compass bearing, 0.0 if the bearing does not exist
      */
     public double getBearing() {
@@ -105,13 +109,19 @@ public class CompassProvider implements SensorEventListener {
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
-        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public interface CompassChangedListener {
         void onCompassBearingChanged(double oldBearing, double newBearing);
     }
 
+    /**
+     * Get the cardinal facing direction shown by the specified bearing,
+     * e.g. north, south
+     *
+     * @param bearing The bearing to get the cardinal direction from
+     * @return The cardinal direction (e.g. "north") as a string
+     */
     public static String getCardinalFacingDirection(double bearing) {
         String compassDirection;
 

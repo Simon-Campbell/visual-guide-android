@@ -1,4 +1,6 @@
-package nz.ac.waikato.ssc10.BlindAssistant;
+package nz.ac.waikato.ssc10.input;
+
+import nz.ac.waikato.ssc10.BlindAssistant.BlindAssistant;
 
 import java.util.Map;
 

@@ -1,6 +1,4 @@
-package nz.ac.waikato.ssc10.BlindAssistant;
-
-import nz.ac.waikato.ssc10.navigation.NavigationStep;
+package nz.ac.waikato.ssc10.navigation;
 
 import java.util.List;
 

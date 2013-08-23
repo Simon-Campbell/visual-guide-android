@@ -1,5 +1,7 @@
-package nz.ac.waikato.ssc10.BlindAssistant;
+package nz.ac.waikato.ssc10.navigation;
 
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.util.Log;
 import com.google.android.gms.location.LocationClient;
@@ -7,9 +9,8 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import nz.ac.waikato.ssc10.map.LatLng;
 import nz.ac.waikato.ssc10.map.WalkingDirections;
-import nz.ac.waikato.ssc10.navigation.CompassProvider;
-import nz.ac.waikato.ssc10.navigation.NavigationStep;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -21,6 +22,23 @@ import java.util.concurrent.ArrayBlockingQueue;
  */
 public class IncrementalNavigator {
     public static final double PATH_BEARING_THRESH_DEG = 90.0;
+
+    private static final int MILLISECONDS_PER_SECOND = 1000;
+    private static final int SECONDS_PER_DAY = 86400;
+
+    private static final int HOURS_PER_DAY = 24;
+    private static final int HOURS_USER_IS_AWAKE = 12;
+
+    private static final int PREFERRED_GEOCODE_UPDATES_PER_DAY = 2000;
+    private static final int MAX_GEOCODE_UPDATES_PER_DAY = 2500;
+
+    private static final int GEOCODE_PREFERRED_UPDATE_INTERVAL_SECONDS =
+            ((SECONDS_PER_DAY / (HOURS_PER_DAY / HOURS_USER_IS_AWAKE))
+                    / PREFERRED_GEOCODE_UPDATES_PER_DAY);
+
+    private static final int GEOCODE_PREFERRED_UPDATE_INTERVAL_MILLISECONDS =
+            GEOCODE_PREFERRED_UPDATE_INTERVAL_SECONDS * MILLISECONDS_PER_SECOND;
+
     private static String TAG = "IncrementalNavigator";
 
     private int currentIdx = 0;
@@ -46,6 +64,7 @@ public class IncrementalNavigator {
     private NavigatorUpdateListener navigatorUpdateListener;
 
     private LocationClient locationClient;
+    private Geocoder geocoder;
     private LocationRequest locationRequest;
     private CompassProvider compassProvider;
 
@@ -54,8 +73,48 @@ public class IncrementalNavigator {
     private LocationListener locationListener = new LocationListener() {
         private Location anchorLocation = null;
 
+        private Address lastGeocodeAddress = null;
+        private long lastGeocodeUpdate = 0;
+
         private static final double MOVE_DISTANCE_THRESH = 2.5;
         private static final double UPDATE_DISTANCE_THRESH = 10.0;
+
+        /**
+         * Detect a street change based on the passed location
+         * @param l The new location to compare to the previous
+         *          location and thus detect a street change.
+         */
+        private void detectStreetChange(Location l) {
+            long now = System.currentTimeMillis();
+
+            // If the time difference is greater than the preferred time
+            // then we'll do a check
+            if ((now - lastGeocodeUpdate) > GEOCODE_PREFERRED_UPDATE_INTERVAL_MILLISECONDS) {
+
+                try {
+                    List<Address> results = geocoder.getFromLocation(l.getLatitude(), l.getLongitude(), 1);
+
+                    if (results != null && results.size() != 0) {
+                        Address currentAddress = results.get(0);
+
+                        if (lastGeocodeAddress == null) {
+                            lastGeocodeAddress = currentAddress;
+                        } else {
+                            String current = currentAddress.getThoroughfare();
+                            String last = lastGeocodeAddress.getThoroughfare();
+
+                            if (!current.equals(last)) {
+                                Log.d(TAG, "The street has changed from " + last + " to " + current);
+                            }
+                        }
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    lastGeocodeUpdate = System.currentTimeMillis();
+                }
+            }
+        }
 
         @Override
         public void onLocationChanged(Location location) {
@@ -125,7 +184,7 @@ public class IncrementalNavigator {
         }
     };
 
-    public IncrementalNavigator(LocationClient locationClient, CompassProvider compassProvider) {
+    public IncrementalNavigator(LocationClient locationClient, CompassProvider compassProvider, Geocoder geocoder) {
         this.compassProvider = compassProvider;
 
         this.locationRequest = LocationRequest.create();

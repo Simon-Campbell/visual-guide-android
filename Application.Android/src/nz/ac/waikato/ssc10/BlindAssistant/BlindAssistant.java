@@ -13,11 +13,16 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
+import nz.ac.waikato.ssc10.input.BluetoothHeadsetUtils;
+import nz.ac.waikato.ssc10.input.VoiceMethod;
+import nz.ac.waikato.ssc10.input.VoiceMethodFactory;
 import nz.ac.waikato.ssc10.map.GoogleWalkingDirections;
 import nz.ac.waikato.ssc10.map.NoSuchRouteException;
 import nz.ac.waikato.ssc10.map.WalkingDirections;
 import nz.ac.waikato.ssc10.navigation.CompassProvider;
+import nz.ac.waikato.ssc10.navigation.IncrementalNavigator;
 import nz.ac.waikato.ssc10.navigation.NavigationStep;
+import nz.ac.waikato.ssc10.navigation.NavigatorUpdateListener;
 import org.javatuples.Pair;
 
 import java.io.IOException;
@@ -45,13 +50,17 @@ public class BlindAssistant implements NavigatorUpdateListener {
 
     private SensorManager sensorManager;
     private CompassProvider compassProvider;
+    private Geocoder geocoder;
 
     private IncrementalNavigator navigator = null;
     private LocationClient locationClient = null;
+    private BluetoothHeadsetUtils bluetoothUtils;
 
-    public BlindAssistant(Context context) {
+    public BlindAssistant(Context context, BluetoothHeadsetUtils bluetoothUtils) {
         Log.d(TAG, "The blind assistant has been started");
 
+        this.geocoder = new Geocoder(context, Locale.getDefault());
+        this.bluetoothUtils = bluetoothUtils;
         this.context = context;
         this.voiceMethodFactory = VoiceMethodFactory.createStandardFactory();
 
@@ -168,7 +177,14 @@ public class BlindAssistant implements NavigatorUpdateListener {
     }
 
     public void sayInstruction(String instruction) {
-        tts.speak(instruction, TextToSpeech.QUEUE_FLUSH, null);
+        HashMap<String, String> params = null;
+
+        if (bluetoothUtils.isOnHeadsetSco()) {
+            params = new HashMap<String, String>();
+            params.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(AudioManager.STREAM_VOICE_CALL));
+        }
+
+        tts.speak(instruction, TextToSpeech.QUEUE_FLUSH, params);
     }
 
     public void assist(String request) {
@@ -205,7 +221,6 @@ public class BlindAssistant implements NavigatorUpdateListener {
 
     public String getLocationName(Location location) {
         String locationName;
-        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
 
         if (location != null) {
             try {
@@ -233,16 +248,15 @@ public class BlindAssistant implements NavigatorUpdateListener {
         return thoroughfare.replaceFirst("\\wRd$", "road");
     }
 
-    public void sayOnHeadset(String text) {
-        HashMap<String, String> params = new HashMap<String, String>();
-
-        params.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(AudioManager.STREAM_VOICE_CALL));
-
-        tts.speak(text, TextToSpeech.QUEUE_FLUSH, params);
-    }
-
     public void say(String text) {
-        tts.speak(text, TextToSpeech.QUEUE_ADD, null);
+        HashMap<String, String> params = null;
+
+        if (bluetoothUtils.isOnHeadsetSco()) {
+            params = new HashMap<String, String>();
+            params.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(AudioManager.STREAM_VOICE_CALL));
+        }
+
+        tts.speak(text, TextToSpeech.QUEUE_ADD, params);
     }
 
     public void shutdown() {
@@ -263,7 +277,7 @@ public class BlindAssistant implements NavigatorUpdateListener {
         public void onConnected(Bundle bundle) {
             say("the application has connected to the location service");
 
-            navigator = new IncrementalNavigator(locationClient, compassProvider);
+            navigator = new IncrementalNavigator(locationClient, compassProvider, geocoder);
             navigator.setNavigatorUpdateListener(BlindAssistant.this);
         }
 

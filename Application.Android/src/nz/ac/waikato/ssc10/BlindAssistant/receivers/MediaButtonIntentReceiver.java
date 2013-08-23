@@ -1,11 +1,11 @@
-package nz.ac.waikato.ssc10.BlindAssistant;
+package nz.ac.waikato.ssc10.BlindAssistant.receivers;
 
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.view.KeyEvent;
+import nz.ac.waikato.ssc10.BlindAssistant.services.BlindAssistantService;
 
 /**
  * Created with IntelliJ IDEA.

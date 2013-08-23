@@ -10,13 +10,18 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/status_title"
-        android:id="@+id/textview_status_lbl"/>
+        android:id="@+id/textview_status_lbl"
+        android:textSize="@dimen/status_header_font_size"
+        android:enabled="true"
+        android:textStyle="bold"/>
 
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/voice_status_none"
-        android:id="@+id/textview_status"/>
+        android:id="@+id/textview_status"
+        android:textSize="@dimen/status_font_size"
+        android:textStyle="italic"/>
 
     <Button
         android:layout_width="fill_parent"
@@ -26,4 +31,15 @@
         android:height="@dimen/button_size"
         android:longClickable="false"
         android:importantForAccessibility="yes"/>
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/button_size"
+        android:text="@string/test_button_1"
+        android:id="@+id/test_button_1"
+        android:height="@dimen/button_size"
+        android:longClickable="false"
+        android:importantForAccessibility="no"
+        android:enabled="true"
+        android:visibility="visible"/>
 </LinearLayout>

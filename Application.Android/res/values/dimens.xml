@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="button_size">100dp</dimen>
+    <dimen name="status_font_size">20sp</dimen>
+    <dimen name="status_header_font_size">24sp</dimen>
 </resources>

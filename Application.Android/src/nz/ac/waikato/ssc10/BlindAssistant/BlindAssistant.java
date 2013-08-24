@@ -13,7 +13,7 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
-import nz.ac.waikato.ssc10.input.BluetoothHeadsetUtils;
+import nz.ac.waikato.ssc10.input.BluetoothHeadsetHelper;
 import nz.ac.waikato.ssc10.input.VoiceMethod;
 import nz.ac.waikato.ssc10.input.VoiceMethodFactory;
 import nz.ac.waikato.ssc10.map.GoogleWalkingDirections;
@@ -54,13 +54,14 @@ public class BlindAssistant implements NavigatorUpdateListener {
 
     private IncrementalNavigator navigator = null;
     private LocationClient locationClient = null;
-    private BluetoothHeadsetUtils bluetoothUtils;
 
-    public BlindAssistant(Context context, BluetoothHeadsetUtils bluetoothUtils) {
+    private BluetoothHeadsetHelper bluetoothHelper;
+
+    public BlindAssistant(Context context, BluetoothHeadsetHelper bluetoothHelper) {
         Log.d(TAG, "The blind assistant has been started");
 
         this.geocoder = new Geocoder(context, Locale.getDefault());
-        this.bluetoothUtils = bluetoothUtils;
+        this.bluetoothHelper = bluetoothHelper;
         this.context = context;
         this.voiceMethodFactory = VoiceMethodFactory.createStandardFactory();
 
@@ -179,7 +180,7 @@ public class BlindAssistant implements NavigatorUpdateListener {
     public void sayInstruction(String instruction) {
         HashMap<String, String> params = null;
 
-        if (bluetoothUtils.isOnHeadsetSco()) {
+        if (bluetoothHelper.isBluetoothAudioConnected()) {
             params = new HashMap<String, String>();
             params.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(AudioManager.STREAM_VOICE_CALL));
         }
@@ -251,7 +252,7 @@ public class BlindAssistant implements NavigatorUpdateListener {
     public void say(String text) {
         HashMap<String, String> params = null;
 
-        if (bluetoothUtils.isOnHeadsetSco()) {
+        if (bluetoothHelper.isBluetoothAudioConnected()) {
             params = new HashMap<String, String>();
             params.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(AudioManager.STREAM_VOICE_CALL));
         }

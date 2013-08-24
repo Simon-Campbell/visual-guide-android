@@ -9,13 +9,17 @@ import java.util.List;
  * A subclass of BluetoothHeadsetUtils which allows for listener
  * classes to listen in on the events.
  */
-public class BluetoothHeadsetHelper extends BluetoothHeadsetUtils {
-    private List<BluetoothHeadsetListener> mListeners;
+public class BluetoothHeadsetHelper {
+    private List<BluetoothHeadsetListener> listeners;
+
+    private Context context;
+    private BluetoothHeadsetUtils bluetoothUtils;
 
     public BluetoothHeadsetHelper(Context context) {
-        super(context);
+        this.context = context;
 
-        mListeners = new ArrayList<BluetoothHeadsetListener>();
+        this.bluetoothUtils = new BluetoothHeadsetHelperHelper(context);
+        this.listeners = new ArrayList<BluetoothHeadsetListener>();
     }
 
     /**
@@ -24,7 +28,7 @@ public class BluetoothHeadsetHelper extends BluetoothHeadsetUtils {
      * @param listener The listener that will listen to the events
      */
     public void addBluetoothHeadsetListener(BluetoothHeadsetListener listener) {
-        mListeners.add(listener);
+        listeners.add(listener);
     }
 
     /**
@@ -34,7 +38,19 @@ public class BluetoothHeadsetHelper extends BluetoothHeadsetUtils {
      *                 events
      */
     public void removeBluetoothHeadsetListener(BluetoothHeadsetListener listener) {
-        mListeners.remove(listener);
+        listeners.remove(listener);
+    }
+
+    public void start() {
+        bluetoothUtils.start();
+    }
+
+    public void stop() {
+        bluetoothUtils.stop();
+    }
+
+    public boolean isBluetoothAudioConnected() {
+        return bluetoothUtils.isOnHeadsetSco();
     }
 
     /**
@@ -42,38 +58,42 @@ public class BluetoothHeadsetHelper extends BluetoothHeadsetUtils {
      */
     public interface BluetoothHeadsetListener {
         void onScoAudioConnected();
-
         void onScoAudioDisconnected();
-
         void onHeadsetDisconnected();
-
         void onHeadsetConnected();
     }
 
-    ;
+    private class BluetoothHeadsetHelperHelper extends BluetoothHeadsetUtils {
+        public BluetoothHeadsetHelperHelper(Context c) {
+            super(c);
+        }
 
-    @Override
-    public void onScoAudioDisconnected() {
-        for (BluetoothHeadsetListener l : mListeners)
-            l.onScoAudioDisconnected();
+        @Override
+        public void onScoAudioDisconnected() {
+            for (BluetoothHeadsetListener l : listeners) {
+                l.onScoAudioDisconnected();
+            }
+        }
 
-    }
+        @Override
+        public void onScoAudioConnected() {
+            for (BluetoothHeadsetListener l : listeners) {
+                l.onScoAudioConnected();
+            }
+        }
 
-    @Override
-    public void onScoAudioConnected() {
-        for (BluetoothHeadsetListener l : mListeners)
-            l.onScoAudioConnected();
-    }
+        @Override
+        public void onHeadsetDisconnected() {
+            for (BluetoothHeadsetListener l : listeners) {
+                l.onHeadsetDisconnected();
+            }
+        }
 
-    @Override
-    public void onHeadsetDisconnected() {
-        for (BluetoothHeadsetListener l : mListeners)
-            l.onHeadsetDisconnected();
-    }
-
-    @Override
-    public void onHeadsetConnected() {
-        for (BluetoothHeadsetListener l : mListeners)
-            l.onHeadsetConnected();
+        @Override
+        public void onHeadsetConnected() {
+            for (BluetoothHeadsetListener l : listeners) {
+                l.onHeadsetConnected();
+            }
+        }
     }
 }

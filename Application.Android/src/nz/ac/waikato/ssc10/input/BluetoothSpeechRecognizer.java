@@ -25,7 +25,6 @@ public class BluetoothSpeechRecognizer {
 
         this.bluetoothHelper = headsetHelper;
         this.bluetoothHelper.addBluetoothHeadsetListener(btHeadsetListener);
-        this.bluetoothHelper.start();
 
         this.speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context);
         this.speechRecognizer.setRecognitionListener(new BluetoothRecognitionListener());
@@ -59,12 +58,10 @@ public class BluetoothSpeechRecognizer {
     }
 
     public void shutdown() {
-        stop();
+        this.stop();
 
-        bluetoothHelper.removeBluetoothHeadsetListener(btHeadsetListener);
-
-        speechRecognizer.cancel();
-        speechRecognizer.destroy();
+        this.bluetoothHelper.removeBluetoothHeadsetListener(btHeadsetListener);
+        this.speechRecognizer.destroy();
     }
 
     /**

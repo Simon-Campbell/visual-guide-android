@@ -39,10 +39,7 @@ public class BlindAssistantService extends Service {
     private BluetoothSpeechRecognizer mRecognizer;
 
     private final IBinder binder = new BlindAssistantBinder();
-
-    private AudioManager audioManager;
     private BluetoothHeadsetHelper bluetoothHelper;
-    private NotificationManager notificationManager;
 
     public void setRecognitionListener(RecognitionListener recognitionListener) {
         this.recognitionListener = recognitionListener;
@@ -61,10 +58,8 @@ public class BlindAssistantService extends Service {
 
     @Override
     public void onCreate() {
-        this.notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        this.audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-
         this.bluetoothHelper = new BluetoothHeadsetHelper(this);
+        this.bluetoothHelper.start();
 
         // The code needs to intercept the Bluetooth recognition to provide appropriate
         // feedback
@@ -110,6 +105,9 @@ public class BlindAssistantService extends Service {
 
         mRecognizer.shutdown();
         mAssistant.shutdown();
+
+        // Stop the bluetooth helper!
+        bluetoothHelper.stop();
     }
 
     @Override

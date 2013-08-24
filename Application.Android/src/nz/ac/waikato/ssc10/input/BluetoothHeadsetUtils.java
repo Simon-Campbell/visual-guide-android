@@ -435,11 +435,15 @@ public abstract class BluetoothHeadsetUtils {
                     onHeadsetDisconnected();
 
                     Log.d(TAG, "Headset disconnected"); //$NON-NLS-1$
+                } else {
+                    Log.d(TAG, "Headset connecting??? state = " + state);
                 }
-            } else // audio
+            }
+            else // audio
             {
                 state = intent.getIntExtra(BluetoothHeadset.EXTRA_STATE, BluetoothHeadset.STATE_AUDIO_DISCONNECTED);
                 Log.d(TAG, "\nAction = " + action + "\nState = " + state); //$NON-NLS-1$ //$NON-NLS-2$
+
                 if (state == BluetoothHeadset.STATE_AUDIO_CONNECTED) {
                     Log.d(TAG, "\nHeadset audio connected");  //$NON-NLS-1$
 
@@ -463,6 +467,8 @@ public abstract class BluetoothHeadsetUtils {
                     onScoAudioDisconnected();
 
                     Log.d(TAG, "Headset audio disconnected"); //$NON-NLS-1$
+                } else {
+                    Log.d(TAG, "Headset audio connecting??? state = " + state);
                 }
             }
         }
@@ -480,9 +486,11 @@ public abstract class BluetoothHeadsetUtils {
             // First stick calls always returns false. The second stick
             // always returns true if the countDownInterval is set to 1000.
             // It is somewhere in between 500 to a 1000.
-            mBluetoothHeadset.startVoiceRecognition(mConnectedHeadset);
-
-            Log.d(TAG, "onTick startVoiceRecognition"); //$NON-NLS-1$
+            if (mBluetoothHeadset.startVoiceRecognition(mConnectedHeadset)) {
+                Log.d(TAG, "Expect the STATE_AUDIO_CONNECTED event");
+            } else {
+                Log.d(TAG, "Do not expect the STATE_AUDIO_CONNECTED event");
+            }
         }
 
         @SuppressWarnings("synthetic-access")

@@ -1,5 +1,6 @@
 package nz.ac.waikato.ssc10.map;
 
+import android.location.Location;
 import nz.ac.waikato.ssc10.navigation.NavigationStep;
 
 import java.util.List;
@@ -13,4 +14,5 @@ import java.util.List;
  */
 public interface WalkingDirections {
     public List<NavigationStep> getSteps();
+    public WalkingDirections routeFrom(Location location) throws NoSuchRouteException;
 }

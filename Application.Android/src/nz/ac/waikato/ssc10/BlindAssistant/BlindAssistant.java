@@ -116,7 +116,9 @@ public class BlindAssistant implements NavigatorUpdateListener {
     }
 
     @Override
-    public void onPathUpdated(IncrementalNavigator navigator, List<NavigationStep> newSteps, List<NavigationStep> oldSteps, NavigationStep oldStep) {
+    public void onPathUpdated(IncrementalNavigator navigator, List<NavigationStep> newSteps) {
+        Log.d(TAG, "onPathUpdated -> New steps size = " + newSteps.size());
+
         say("the path was updated");
     }
 
@@ -278,7 +280,7 @@ public class BlindAssistant implements NavigatorUpdateListener {
         public void onConnected(Bundle bundle) {
             say("the application has connected to the location service");
 
-            navigator = new IncrementalNavigator(locationClient, compassProvider, geocoder);
+            navigator = new IncrementalNavigator(context, locationClient, compassProvider, geocoder);
             navigator.setNavigatorUpdateListener(BlindAssistant.this);
         }
 

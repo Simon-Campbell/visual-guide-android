@@ -35,11 +35,28 @@ public class GoogleWalkingDirections implements WalkingDirections {
 
     private static final String API_MODE_PARAM = "mode";
 
+    /**
+     *
+     * @param startLocation
+     * @param endAddress
+     * @throws NoSuchRouteException
+     */
     public GoogleWalkingDirections(Location startLocation, String endAddress) throws NoSuchRouteException {
-        this.startAddress = String.format("%f,%f", startLocation.getLatitude(), startLocation.getLatitude());
+        this.startAddress = stringify(startLocation);
         this.endAddress = endAddress;
 
         this.update();
+    }
+
+    /**
+     * Converts a Location object to a string in the format of 'Latitude,Longitude' so that
+     * the location can be put into an API string.
+     * @param location The location to convert to the specified format.
+     * @return
+     *  The location in the specified format as a String.
+     */
+    private String stringify(Location location) {
+        return String.format("%f,%f", location.getLatitude(), location.getLongitude());
     }
 
     public GoogleWalkingDirections(String startAddress, String endAddress) throws NoSuchRouteException {
@@ -77,6 +94,23 @@ public class GoogleWalkingDirections implements WalkingDirections {
         }
 
         return content.toString();
+    }
+
+    /**
+     * Routes the current walking directions from the specified location to
+     * the already specified end location.
+     * @param from
+     *  The new location to route from
+     * @return
+     *  A NEW GoogleWalkingDirections object from the specified Location
+     *  to the already specified end location.
+     * @throws NoSuchRouteException
+     *  When there is no route from the current location
+     *  to the destination.
+     */
+    @Override
+    public WalkingDirections routeFrom(Location from) throws NoSuchRouteException {
+        return new GoogleWalkingDirections(from, this.endAddress);
     }
 
     private void update() throws NoSuchRouteException {

@@ -1,13 +1,22 @@
 package nz.ac.waikato.ssc10.navigation;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.os.Bundle;
+import android.os.IBinder;
+import android.os.ResultReceiver;
 import android.util.Log;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import nz.ac.waikato.ssc10.BlindAssistant.services.WalkingDirectionsUpdateService;
 import nz.ac.waikato.ssc10.map.LatLng;
+import nz.ac.waikato.ssc10.map.NoSuchRouteException;
 import nz.ac.waikato.ssc10.map.WalkingDirections;
 
 import java.io.IOException;
@@ -63,6 +72,7 @@ public class IncrementalNavigator {
     private Queue<Location> movementHistory;
     private NavigatorUpdateListener navigatorUpdateListener;
 
+    private Context context;
     private LocationClient locationClient;
     private Geocoder geocoder;
     private LocationRequest locationRequest;
@@ -87,6 +97,8 @@ public class IncrementalNavigator {
         private void detectStreetChange(Location l) {
             long now = System.currentTimeMillis();
 
+            Log.d(TAG, "Detecting street change for location " + l);
+
             // If the time difference is greater than the preferred time
             // then we'll do a check
             if ((now - lastGeocodeUpdate) > GEOCODE_PREFERRED_UPDATE_INTERVAL_MILLISECONDS) {
@@ -94,8 +106,12 @@ public class IncrementalNavigator {
                 try {
                     List<Address> results = geocoder.getFromLocation(l.getLatitude(), l.getLongitude(), 1);
 
+                    Log.i(TAG, "Geocoder returned " + results.size() + " results");
+
                     if (results != null && results.size() != 0) {
                         Address currentAddress = results.get(0);
+
+                        Log.i(TAG, "Current address is " + currentAddress);
 
                         if (lastGeocodeAddress == null) {
                             lastGeocodeAddress = currentAddress;
@@ -105,7 +121,34 @@ public class IncrementalNavigator {
 
                             if (!current.equals(last)) {
                                 Log.d(TAG, "The street has changed from " + last + " to " + current);
+
+                                Intent intent = new Intent(context, WalkingDirectionsUpdateService.class);
+                                intent.setAction(WalkingDirectionsUpdateService.ACTION_UPDATE_IF_NEW_PATH);
+
+                                intent.putExtra(WalkingDirectionsUpdateService.EXTRA_LOCATION, l);
+                                intent.putExtra(WalkingDirectionsUpdateService.EXTRA_RESULT_RECEIVER, new ResultReceiver(null) {
+                                    @Override
+                                    protected void onReceiveResult(int resultCode, Bundle resultData) {
+                                        switch (resultCode) {
+                                            case WalkingDirectionsUpdateService.RESULT_OK:
+                                                navigatorUpdateListener.onPathUpdated(IncrementalNavigator.this, walkingDirections.getSteps());
+                                                break;
+                                            case WalkingDirectionsUpdateService.RESULT_NO_ROUTE:
+                                                Log.w(TAG, "A route was unable to be automatically generated");
+                                                break;
+                                        }
+                                    }
+                                });
+
+                                if (walkingDirectionsUpdateService != null) {
+                                    walkingDirectionsUpdateService.startService(intent);
+                                } else {
+                                    Log.e(TAG, "No instance of the service was available to start.");
+                                }
+
                             }
+
+                            lastGeocodeAddress = currentAddress;
                         }
                     }
                 } catch (IOException e) {
@@ -127,6 +170,8 @@ public class IncrementalNavigator {
             if (location.hasBearing()) {
                 headingBearing = location.getBearing();
             }
+
+            detectStreetChange(location);
 
             if (navigatorUpdateListener != null && walkingDirections != null) {
                 List<NavigationStep> steps = walkingDirections.getSteps();
@@ -155,14 +200,19 @@ public class IncrementalNavigator {
                         }
                     }
 
-                    float diff = getDistanceTo(anchorLocation, endLatLng) - distanceTo;
+                    // If we are still navigating then we will check if the
+                    // user is walking away from the next point by doing
+                    // a distance check
+                    if (next != null) {
+                        float diff = getDistanceTo(anchorLocation, endLatLng) - distanceTo;
 
-                    if (diff > MOVE_DISTANCE_THRESH) {
-                        anchorLocation = location;
-                    } else if (diff < -MOVE_DISTANCE_THRESH) {
-                        anchorLocation = location;
+                        if (diff > MOVE_DISTANCE_THRESH) {
+                            anchorLocation = location;
+                        } else if (diff < -MOVE_DISTANCE_THRESH) {
+                            anchorLocation = location;
 
-                        navigatorUpdateListener.onMoveFromPath(IncrementalNavigator.this, 0.0);
+                            navigatorUpdateListener.onMoveFromPath(IncrementalNavigator.this, 0.0);
+                        }
                     }
                 }
 
@@ -184,8 +234,12 @@ public class IncrementalNavigator {
         }
     };
 
-    public IncrementalNavigator(LocationClient locationClient, CompassProvider compassProvider, Geocoder geocoder) {
+    public IncrementalNavigator(Context context, LocationClient locationClient, CompassProvider compassProvider, Geocoder geocoder) {
+        this.context = context;
+        this.bindUpdateService(context);
+
         this.compassProvider = compassProvider;
+        this.geocoder = geocoder;
 
         this.locationRequest = LocationRequest.create();
         this.locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -199,6 +253,33 @@ public class IncrementalNavigator {
         this.movementHistory = new ArrayBlockingQueue<Location>(128);
     }
 
+    private WalkingDirectionsUpdateService walkingDirectionsUpdateService;
+
+    private ServiceConnection updateServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            WalkingDirectionsUpdateService.WalkingDirectionsUpdateServiceBinder
+                    binder = (WalkingDirectionsUpdateService.WalkingDirectionsUpdateServiceBinder) iBinder;
+
+            walkingDirectionsUpdateService = binder.getService();
+            walkingDirectionsUpdateService.setNavigator(IncrementalNavigator.this);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            walkingDirectionsUpdateService = null;
+        }
+    };
+
+    private boolean bindUpdateService(Context context) {
+        Intent intent = new Intent(context, WalkingDirectionsUpdateService.class);
+        return context.bindService(intent, updateServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    private void unbindUpdateService() {
+        context.unbindService(updateServiceConnection);
+    }
+
     public double getLastFacingBearing() {
         return compassProvider.getBearing();
     }
@@ -209,6 +290,17 @@ public class IncrementalNavigator {
 
     public void shutdown() {
         this.locationClient.removeLocationUpdates(locationListener);
+        this.unbindUpdateService();
+    }
+
+
+    /**
+     * Re-route from the specified location to the already specified
+     * location.
+     * @param location
+     */
+    public WalkingDirections routeFrom(Location location) throws NoSuchRouteException {
+        return walkingDirections.routeFrom(location);
     }
 
     public void setWalkingDirections(WalkingDirections walkingDirections) {
@@ -246,6 +338,10 @@ public class IncrementalNavigator {
                 .getStartLocation();
     }
 
+    public NavigationStep getCurrentStep() {
+        return walkingDirections.getSteps().get(currentIdx);
+    }
+
     private LatLng getNextCheckpoint() {
         LatLng next = null;
         List<NavigationStep> steps = walkingDirections.getSteps();
@@ -260,4 +356,5 @@ public class IncrementalNavigator {
     private int getNextRouteIndex() {
         return currentIdx + 1;
     }
+
 }

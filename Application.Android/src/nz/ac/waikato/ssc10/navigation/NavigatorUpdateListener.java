@@ -21,10 +21,8 @@ public interface NavigatorUpdateListener {
      *
      * @param navigator The navigator who has signalled a path update
      * @param newSteps  The new steps that have been generated
-     * @param oldSteps  The old steps that have been replaced
-     * @param oldStep   The old step that the user was carrying out
      */
-    void onPathUpdated(IncrementalNavigator navigator, List<NavigationStep> newSteps, List<NavigationStep> oldSteps, NavigationStep oldStep);
+    void onPathUpdated(IncrementalNavigator navigator, List<NavigationStep> newSteps);
 
     /**
      * This event is called when the guide reaches a junction

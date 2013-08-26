@@ -31,6 +31,7 @@
         </activity>
 
         <service android:name=".services.BlindAssistantService"/>
+        <service android:name=".services.WalkingDirectionsUpdateService"/>
 
         <receiver android:name=".receivers.MediaButtonIntentReceiver">
             <intent-filter>

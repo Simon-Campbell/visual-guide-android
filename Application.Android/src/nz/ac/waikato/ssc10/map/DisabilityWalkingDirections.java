@@ -1,5 +1,6 @@
 package nz.ac.waikato.ssc10.map;
 
+import android.location.Location;
 import nz.ac.waikato.ssc10.navigation.NavigationStep;
 
 import java.util.ArrayList;
@@ -20,6 +21,11 @@ public class DisabilityWalkingDirections extends WalkingDirectionsDecorator {
         List<NavigationStep> aidPoints = getAidPoints();
 
         return decorateSteps(steps, aidPoints);
+    }
+
+    @Override
+    public WalkingDirections routeFrom(Location location) throws NoSuchRouteException {
+        return super.routeFrom(location);
     }
 
     private List<NavigationStep> getAidPoints() {

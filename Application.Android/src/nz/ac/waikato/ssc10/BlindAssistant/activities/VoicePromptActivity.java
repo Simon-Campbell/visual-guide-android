@@ -72,7 +72,6 @@ public class VoicePromptActivity extends Activity {
                 return false;
             }
         });
-
     }
 
     @Override

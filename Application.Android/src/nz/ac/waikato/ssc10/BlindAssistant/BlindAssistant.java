@@ -95,19 +95,19 @@ public class BlindAssistant implements NavigatorUpdateListener {
 
         if (destination != null) {
             final Location location = getCurrentLocation();
-            final String from;
+            final String stringFrom = getCurrentLocationName();
+
+            final WalkingDirectionsTask task;
 
             if (location != null) {
-                from = String.format("%f,%f", location.getLatitude(), location.getLongitude());
+                task = new WalkingDirectionsTask(location);
+
+                say("getting directions to " + destination);
+                task.execute(destination);
             } else {
-                from = getCurrentLocationName();
+                say("unable to get your location. please try again");
             }
 
-            final String to = destination + " New Zealand";
-            say("getting directions to " + destination);
-
-            WalkingDirectionsTask task = new WalkingDirectionsTask();
-            task.execute(from, to);
         } else {
             say("stopping navigation");
 
@@ -158,16 +158,28 @@ public class BlindAssistant implements NavigatorUpdateListener {
     }
 
     private class WalkingDirectionsTask extends AsyncTask<String, Double, WalkingDirections> {
+        private Location locationFrom = null;
+        private String stringFrom = null;
+
+        public WalkingDirectionsTask(Location from) {
+            this.locationFrom = from;
+            this.stringFrom = "your current location";
+        }
 
         @Override
         protected WalkingDirections doInBackground(String... strings) {
             WalkingDirections directions = null;
+
             try {
-                directions = new GoogleWalkingDirections(strings[0], strings[1]);
+                if (locationFrom != null) {
+                    directions = new GoogleWalkingDirections(locationFrom, strings[0]);
+                } else {
+                    throw new NoSuchRouteException("no location was specified");
+                }
             } catch (NoSuchRouteException ex) {
                 Log.e(TAG, "A route was not able to be found", ex);
 
-                say("i was unable to route you from " + strings[0] + " to " + strings[1]);
+                say("i was unable to route you from " + stringFrom + " to " + strings[0]);
             } finally {
                 return directions;
             }

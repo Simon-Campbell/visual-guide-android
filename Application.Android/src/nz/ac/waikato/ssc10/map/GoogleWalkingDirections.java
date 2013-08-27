@@ -1,5 +1,6 @@
 package nz.ac.waikato.ssc10.map;
 
+import android.location.Address;
 import android.location.Location;
 import nz.ac.waikato.ssc10.navigation.NavigationStep;
 import nz.ac.waikato.ssc10.navigation.TimedNavigationStep;
@@ -36,40 +37,50 @@ public class GoogleWalkingDirections implements WalkingDirections {
     private static final String API_MODE_PARAM = "mode";
 
     /**
-     *
      * @param startLocation
-     * @param endAddress
+     * @param endpointName
      * @throws NoSuchRouteException
      */
-    public GoogleWalkingDirections(Location startLocation, String endAddress) throws NoSuchRouteException {
+    public GoogleWalkingDirections(Location startLocation, String endpointName) throws NoSuchRouteException {
+        GooglePlaceProvider placeProvider = new GooglePlaceProvider();
+        placeProvider.setSearchFromLocation(startLocation);
+
+        List<Address> addresses = placeProvider.get(endpointName);
+        Address endAddress = addresses.get(0);
+
+        // TODO:
+        //  Finish this off and make it so WalkingDirections can update based on
+        //  LatLng
         this.startAddress = stringify(startLocation);
         this.endAddress = endAddress;
 
         this.update();
     }
 
+    public GoogleWalkingDirections(Location startLocation, Address endAddress) {
+        this.startAddress = stringify(startLocation);
+        this.endAddress = endAddress;
+    }
+
     /**
      * Converts a Location object to a string in the format of 'Latitude,Longitude' so that
      * the location can be put into an API string.
+     *
      * @param location The location to convert to the specified format.
-     * @return
-     *  The location in the specified format as a String.
+     * @return The location in the specified format as a String.
      */
-    private String stringify(Location location) {
+    private static String stringify(Location location) {
         return String.format("%f,%f", location.getLatitude(), location.getLongitude());
     }
 
-    public GoogleWalkingDirections(String startAddress, String endAddress) throws NoSuchRouteException {
-        this.startAddress = startAddress;
-        this.endAddress = endAddress;
-
-        this.update();
+    private static String stringify(Address address) {
+        return String.format("%f,%f", address.getLatitude(), address.getLongitude());
     }
 
-    private static String getDirections(String from, String to) throws IOException {
+    private static String getDirections(String from, Address to) throws IOException {
         List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
         params.add(new BasicNameValuePair(API_ORIGIN_PARAM, from));
-        params.add(new BasicNameValuePair(API_DEST_PARAM, to));
+        params.add(new BasicNameValuePair(API_DEST_PARAM, stringify(to)));
         params.add(new BasicNameValuePair(API_SENSOR_PARAM, "true"));
         params.add(new BasicNameValuePair(API_MODE_PARAM, "walking"));
 
@@ -99,14 +110,12 @@ public class GoogleWalkingDirections implements WalkingDirections {
     /**
      * Routes the current walking directions from the specified location to
      * the already specified end location.
-     * @param from
-     *  The new location to route from
-     * @return
-     *  A NEW GoogleWalkingDirections object from the specified Location
-     *  to the already specified end location.
-     * @throws NoSuchRouteException
-     *  When there is no route from the current location
-     *  to the destination.
+     *
+     * @param from The new location to route from
+     * @return A NEW GoogleWalkingDirections object from the specified Location
+     *         to the already specified end location.
+     * @throws NoSuchRouteException When there is no route from the current location
+     *                              to the destination.
      */
     @Override
     public WalkingDirections routeFrom(Location from) throws NoSuchRouteException {
@@ -130,7 +139,7 @@ public class GoogleWalkingDirections implements WalkingDirections {
     private LatLng southWestBound;
     private int distanceValue;
     private int durationValue;
-    private String endAddress;
+    private Address endAddress;
     private LatLng endLocation;
     private String startAddress;
     private LatLng startLocation;

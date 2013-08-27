@@ -208,6 +208,10 @@ public class BlindAssistant implements NavigatorUpdateListener {
         tts.speak(instruction, TextToSpeech.QUEUE_FLUSH, params);
     }
 
+    /**
+     * If the user is navigating then say the distance to the next point in the navigation route. If they are not
+     * navigating then say that they are not currently navigating.
+     */
     public void sayDistanceToNextPoint() {
         Location now = locationClient.getLastLocation();
         NavigationStep current = navigator.getCurrentStep();
@@ -218,12 +222,43 @@ public class BlindAssistant implements NavigatorUpdateListener {
             float[] results = new float[1];
             Location.distanceBetween(now.getLatitude(), now.getLongitude(), next.getLatitude(), next.getLongitude(), results);
 
-            say("the next destination is " + results[0] + " meters away");
+            // Round the result because it is irrelevant to the user how many cm they are
+            // away from the destination (too much information)
+            int distance = Math.round(results[0]);
+            say("the next destination is " + distance + " meters away");
         } else {
             say("you are not currently navigating");
         }
     }
 
+    /**
+     * If the user is navigating then say the distance to the last (end) point in the navigation route. If they are not
+     * navigating then say that they are not currently navigating.
+     */
+    public void sayDistanceToEnd() {
+        Location now = locationClient.getLastLocation();
+        NavigationStep current = navigator.getCurrentStep();
+
+        if (current != null) {
+            LatLng next = current.getEndLocation();
+
+            float[] results = new float[1];
+            Location.distanceBetween(now.getLatitude(), now.getLongitude(), next.getLatitude(), next.getLongitude(), results);
+
+            // Round the result because it is irrelevant to the user how many cm they are
+            // away from the destination (too much information)
+            int distance = Math.round(results[0]);
+            say("the final destination is at least " + distance + " meters away");
+        } else {
+            say("you are not currently navigating");
+        }
+    }
+
+    /**
+     * Assist the user with a request string from the user
+     *
+     * @param request The request from the user
+     */
     public void assist(String request) {
         Log.d(TAG, "The blind assistant is assisting the user with the request " + request);
 

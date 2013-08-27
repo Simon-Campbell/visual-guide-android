@@ -74,6 +74,7 @@ public class VoiceMethodFactory {
         voiceMethods.put("what is my compass direction", sayCompassDirection);
         voiceMethods.put("what direction am I facing", sayCompassDirection);
         voiceMethods.put("where am I facing", sayCompassDirection);
+        voiceMethods.put("what way am I facing", sayCompassDirection);
 
         // TODO: Implement sayDistanceToFinal properly
         voiceMethods.put("how far away am I from the final destination", sayDistanceToFinal);

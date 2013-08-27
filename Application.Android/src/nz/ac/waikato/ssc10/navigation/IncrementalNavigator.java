@@ -297,6 +297,7 @@ public class IncrementalNavigator {
     /**
      * Re-route from the specified location to the already specified
      * location.
+     *
      * @param location
      */
     public WalkingDirections routeFrom(Location location) throws NoSuchRouteException {
@@ -338,8 +339,24 @@ public class IncrementalNavigator {
                 .getStartLocation();
     }
 
+    /**
+     * Gets the current step that is being navigated, if the navigator is finished or
+     * not navigating then null will be returned.
+     *
+     * @return The current navigation step, null if navigator is not actively navigating
+     */
     public NavigationStep getCurrentStep() {
-        return walkingDirections.getSteps().get(currentIdx);
+        NavigationStep current = null;
+
+        if (walkingDirections != null) {
+            List<NavigationStep> steps = walkingDirections.getSteps();
+
+            if (currentIdx >= 0 && currentIdx < steps.size()) {
+                current = steps.get(currentIdx);
+            }
+        }
+
+        return current;
     }
 
     private LatLng getNextCheckpoint() {

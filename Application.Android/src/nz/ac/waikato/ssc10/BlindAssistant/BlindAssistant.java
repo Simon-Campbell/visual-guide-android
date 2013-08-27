@@ -17,6 +17,7 @@ import nz.ac.waikato.ssc10.input.BluetoothHeadsetHelper;
 import nz.ac.waikato.ssc10.input.VoiceMethod;
 import nz.ac.waikato.ssc10.input.VoiceMethodFactory;
 import nz.ac.waikato.ssc10.map.GoogleWalkingDirections;
+import nz.ac.waikato.ssc10.map.LatLng;
 import nz.ac.waikato.ssc10.map.NoSuchRouteException;
 import nz.ac.waikato.ssc10.map.WalkingDirections;
 import nz.ac.waikato.ssc10.navigation.CompassProvider;
@@ -191,6 +192,11 @@ public class BlindAssistant implements NavigatorUpdateListener {
         }
     }
 
+    /**
+     * Say the specified text as an instruction
+     *
+     * @param instruction The text to say as an instruction
+     */
     public void sayInstruction(String instruction) {
         HashMap<String, String> params = null;
 
@@ -200,6 +206,22 @@ public class BlindAssistant implements NavigatorUpdateListener {
         }
 
         tts.speak(instruction, TextToSpeech.QUEUE_FLUSH, params);
+    }
+
+    public void sayDistanceToNextPoint() {
+        Location now = locationClient.getLastLocation();
+        NavigationStep current = navigator.getCurrentStep();
+
+        if (current != null) {
+            LatLng next = current.getEndLocation();
+
+            float[] results = new float[1];
+            Location.distanceBetween(now.getLatitude(), now.getLongitude(), next.getLatitude(), next.getLongitude(), results);
+
+            say("the next destination is " + results[0] + " meters away");
+        } else {
+            say("you are not currently navigating");
+        }
     }
 
     public void assist(String request) {

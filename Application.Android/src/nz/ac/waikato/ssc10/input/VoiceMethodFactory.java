@@ -57,7 +57,7 @@ public class VoiceMethodFactory {
     private VoiceMethod sayDistanceToNext = new VoiceMethod() {
         @Override
         public void invoke(BlindAssistant assistant, Map<String, String> arguments) {
-            assistant.say("say distance to next is not implemented");
+            assistant.sayDistanceToNextPoint();
         }
     };
 
@@ -80,6 +80,7 @@ public class VoiceMethodFactory {
         voiceMethods.put("how far away am I from the final destination", sayDistanceToFinal);
 
         // TODO: Implement sayDistanceToNext properly
+        voiceMethods.put("how far away is the next destination", sayDistanceToNext);
         voiceMethods.put("how far away am I from the next destination", sayDistanceToNext);
 
         voiceMethods.put("take me to {Destination}", navigateUser);

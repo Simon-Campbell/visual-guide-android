@@ -7,9 +7,10 @@ import android.content.ServiceConnection;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
-import android.os.ResultReceiver;
+import android.os.Message;
+import android.os.Messenger;
 import android.util.Log;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
@@ -48,7 +49,31 @@ public class IncrementalNavigator {
     private static final int GEOCODE_PREFERRED_UPDATE_INTERVAL_MILLISECONDS =
             GEOCODE_PREFERRED_UPDATE_INTERVAL_SECONDS * MILLISECONDS_PER_SECOND;
 
-    private static String TAG = "IncrementalNavigator";
+    private static final String TAG = "IncrementalNavigator";
+
+    private final Handler directionsUpdateHandler = new Handler() {
+        @Override
+        public void handleMessage(Message message) {
+            switch (message.what) {
+                case WalkingDirectionsUpdateService.RESULT_OK:
+                    setWalkingDirections((WalkingDirections) message.obj);
+
+                    if (navigatorUpdateListener != null) {
+                        navigatorUpdateListener.onPathUpdated(IncrementalNavigator.this, walkingDirections.getSteps());
+                    }
+
+                    break;
+
+                case WalkingDirectionsUpdateService.RESULT_NO_ROUTE:
+                    Log.w(TAG, "A route was unable to be automatically generated");
+                    break;
+            }
+        }
+
+        ;
+    };
+
+    private final Messenger directionsUpdateMessenger = new Messenger(directionsUpdateHandler);
 
     private int currentIdx = 0;
 
@@ -119,26 +144,15 @@ public class IncrementalNavigator {
                             String current = currentAddress.getThoroughfare();
                             String last = lastGeocodeAddress.getThoroughfare();
 
+                            // TODO: This should be negated...!!
                             if (!current.equals(last)) {
                                 Log.d(TAG, "The street has changed from " + last + " to " + current);
 
                                 Intent intent = new Intent(context, WalkingDirectionsUpdateService.class);
-                                intent.setAction(WalkingDirectionsUpdateService.ACTION_UPDATE_IF_NEW_PATH);
+                                intent.setAction(WalkingDirectionsUpdateService.ACTION_UPDATE_ROUTE);
 
                                 intent.putExtra(WalkingDirectionsUpdateService.EXTRA_LOCATION, l);
-                                intent.putExtra(WalkingDirectionsUpdateService.EXTRA_RESULT_RECEIVER, new ResultReceiver(null) {
-                                    @Override
-                                    protected void onReceiveResult(int resultCode, Bundle resultData) {
-                                        switch (resultCode) {
-                                            case WalkingDirectionsUpdateService.RESULT_OK:
-                                                navigatorUpdateListener.onPathUpdated(IncrementalNavigator.this, walkingDirections.getSteps());
-                                                break;
-                                            case WalkingDirectionsUpdateService.RESULT_NO_ROUTE:
-                                                Log.w(TAG, "A route was unable to be automatically generated");
-                                                break;
-                                        }
-                                    }
-                                });
+                                intent.putExtra(WalkingDirectionsUpdateService.EXTRA_MESSENGER, directionsUpdateMessenger);
 
                                 if (walkingDirectionsUpdateService != null) {
                                     walkingDirectionsUpdateService.startService(intent);

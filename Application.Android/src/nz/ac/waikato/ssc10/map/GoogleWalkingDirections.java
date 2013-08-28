@@ -57,9 +57,11 @@ public class GoogleWalkingDirections implements WalkingDirections {
         this.update();
     }
 
-    public GoogleWalkingDirections(Location startLocation, Address endAddress) {
+    public GoogleWalkingDirections(Location startLocation, Address endAddress) throws NoSuchRouteException {
         this.startAddress = stringify(startLocation);
         this.endAddress = endAddress;
+
+        this.update();
     }
 
     /**

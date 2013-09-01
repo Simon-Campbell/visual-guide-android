@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.view.KeyEvent;
+import nz.ac.waikato.ssc10.BlindAssistant.activities.VoiceInputActivity;
 import nz.ac.waikato.ssc10.BlindAssistant.services.BlindAssistantService;
 
 /**
@@ -30,9 +31,9 @@ public class MediaButtonIntentReceiver extends BroadcastReceiver {
                 if (action == KeyEvent.ACTION_DOWN) {
                     Log.i(TAG, "Media button pressed");
 
-                    Intent service = new Intent(context, BlindAssistantService.class);
-                    service.setAction(BlindAssistantService.ACTION_START_LISTEN);
-                    context.startService(service);
+                    Intent voiceInput = new Intent(context, VoiceInputActivity.class);
+                    voiceInput.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(voiceInput);
                 }
             }
         }

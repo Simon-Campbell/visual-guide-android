@@ -5,19 +5,15 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.speech.RecognitionListener;
 import android.speech.SpeechRecognizer;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import com.google.android.gms.common.ConnectionResult;
 import nz.ac.waikato.ssc10.BlindAssistant.R;
-import nz.ac.waikato.ssc10.BlindAssistant.receivers.MediaButtonIntentReceiver;
 import nz.ac.waikato.ssc10.BlindAssistant.services.BlindAssistantService;
 import nz.ac.waikato.ssc10.util.SpeechRecognizerUtil;
 
@@ -26,53 +22,26 @@ import java.util.ArrayList;
 import static com.google.android.gms.common.GooglePlayServicesUtil.isGooglePlayServicesAvailable;
 
 /**
- * An activity that prompts the user for voice input. This is where commands are
- * input by touching a button on screen.
+ * This activity starts and accepts the users voice input as soon as
+ * input is bound.
  */
-public class VoicePromptActivity extends Activity {
+public class VoiceInputActivity extends Activity {
     private static final String TAG = "VoicePromptActivity";
 
     private BlindAssistantService blindAssistantService;
     private boolean blindAssistantServiceBounded;
 
     private int googlePlayServices = ConnectionResult.SERVICE_MISSING;
-
     private TextView mStatus;
-    private Button mButton;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.voice_prompt);
 
-        AudioManager audioManager = ((AudioManager) getSystemService(AUDIO_SERVICE));
-        audioManager.registerMediaButtonEventReceiver(new ComponentName(this, MediaButtonIntentReceiver.class));
+        Log.d(TAG, "onCreate -> VoiceInputActivity");
 
+        this.setContentView(R.layout.voice_input);
+        this.mStatus = (TextView) findViewById(R.id.textview_status);
         this.doBindService();
-
-        mButton = (Button) findViewById(R.id.request_assist_button);
-        mStatus = (TextView) findViewById(R.id.textview_status);
-
-        mButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        if (googlePlayServices == ConnectionResult.SUCCESS) {
-                            blindAssistantService.startListening();
-                        } else {
-                            blindAssistantService.say("Google Play Services is not available");
-                        }
-
-                        return true;
-
-                    case MotionEvent.ACTION_UP:
-                        return false;
-                }
-
-                return false;
-            }
-        });
-
     }
 
     @Override
@@ -85,8 +54,6 @@ public class VoicePromptActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
-        this.blindAssistantService.shutdown();
         this.doUnbindService();
     }
 
@@ -96,13 +63,6 @@ public class VoicePromptActivity extends Activity {
     }
 
     private void showStatus(SpeechRecognizerUtil.VoiceStatus status, Object parameter) {
-        // There are no UI elements to put the status items onto, return early if this
-        // is the case
-        if (mStatus == null || mButton == null) {
-            return;
-        }
-
-        boolean showOnButton = true;
         CharSequence statusMsg = getText(R.string.voice_status_none);
 
         switch (status) {
@@ -128,8 +88,6 @@ public class VoicePromptActivity extends Activity {
                         err
                 );
 
-                showOnButton = false;
-
                 break;
             case RESULTS:
                 statusMsg = String.format(
@@ -137,19 +95,7 @@ public class VoicePromptActivity extends Activity {
                         parameter.toString()
                 );
 
-                showOnButton = false;
-
                 break;
-        }
-
-        if (showOnButton) {
-            Button b = this.mButton;
-
-            b.setEnabled(false);
-            b.setText(statusMsg);
-        } else {
-            mButton.setEnabled(true);
-            mButton.setText(getText(R.string.request_assistance));
         }
 
         this.mStatus.setText(statusMsg);
@@ -189,6 +135,9 @@ public class VoicePromptActivity extends Activity {
             Log.e(TAG, "An error has occured " + i);
 
             showStatus(SpeechRecognizerUtil.VoiceStatus.ERROR, i);
+
+            setResult(Activity.RESULT_OK);
+            finish();
         }
 
         @Override
@@ -199,6 +148,9 @@ public class VoicePromptActivity extends Activity {
             String bestResult = results.get(0);
 
             showStatus(SpeechRecognizerUtil.VoiceStatus.RESULTS, String.format("%s", bestResult));
+
+            setResult(Activity.RESULT_OK);
+            finish();
         }
 
         @Override
@@ -216,6 +168,11 @@ public class VoicePromptActivity extends Activity {
         public void onServiceConnected(ComponentName className, IBinder service) {
             blindAssistantService = ((BlindAssistantService.BlindAssistantBinder) service).getService();
             blindAssistantService.setRecognitionListener(new VoiceRecognitionListener());
+
+            Context ctx = VoiceInputActivity.this;
+            Intent svc = new Intent(ctx, BlindAssistantService.class);
+            svc.setAction(BlindAssistantService.ACTION_START_LISTEN);
+            ctx.startService(svc);
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -224,7 +181,7 @@ public class VoicePromptActivity extends Activity {
     };
 
     private void doBindService() {
-        bindService(new Intent(this, BlindAssistantService.class), serviceConnection, Context.BIND_AUTO_CREATE);
+        bindService(new Intent(this, BlindAssistantService.class), serviceConnection, Context.BIND_AUTO_CREATE | Context.BIND_ABOVE_CLIENT);
 
         blindAssistantServiceBounded = true;
     }
@@ -236,5 +193,4 @@ public class VoicePromptActivity extends Activity {
             blindAssistantServiceBounded = false;
         }
     }
-
 }

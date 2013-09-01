@@ -28,15 +28,15 @@ import java.util.ArrayList;
  */
 public class BlindAssistantService extends Service {
     private static final String TAG = "BlindAssistantService";
-    private static final int SERVICE_NOTIFICATION_ID = 0xdeadbeef;
+    private static final int SERVICE_NOTIFICATION_ID = (0xdeadbeef) + (0x1337 / 0x23);
 
-    public static final String ACTION_START_LISTEN = "blind_assist_svc://action_listen";
-    public static final String ACTION_SAY_TEXT = "blind_assist_svc://action_say_text";
+    public static final String ACTION_START_LISTEN = BlindAssistantService.class.getName() + ".START_LISTEN";
+    public static final String ACTION_SAY_TEXT = BlindAssistantService.class.getName() + ".SAY_TEXT";
     public static final String EXTRA_SAY_TEXT = "extra_say_text";
 
     private BlindAssistant mAssistant;
-    private RecognitionListener recognitionListener;
     private BluetoothSpeechRecognizer mRecognizer;
+    private RecognitionListener recognitionListener;
 
     private final IBinder binder = new BlindAssistantBinder();
     private BluetoothHeadsetHelper bluetoothHelper;
@@ -58,6 +58,8 @@ public class BlindAssistantService extends Service {
 
     @Override
     public void onCreate() {
+        super.onCreate();
+
         this.bluetoothHelper = new BluetoothHeadsetHelper(this);
         this.bluetoothHelper.start();
 
@@ -88,10 +90,14 @@ public class BlindAssistantService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "Received start id " + startId + ": " + intent);
 
-        if (ACTION_START_LISTEN.equals(intent.getAction())) {
-            startListening();
-        } else if (ACTION_SAY_TEXT.equals(intent.getAction())) {
-            say("this feature is not implemented");
+        if (intent != null) {
+            if (ACTION_START_LISTEN.equals(intent.getAction())) {
+                startListening();
+            } else if (ACTION_SAY_TEXT.equals(intent.getAction())) {
+                say("this feature is not implemented");
+            }
+        } else {
+
         }
 
         // We want this service to continue running until it is explicitly
@@ -101,7 +107,7 @@ public class BlindAssistantService extends Service {
 
     @Override
     public void onDestroy() {
-        stopForeground(true);
+        super.onDestroy();
 
         mRecognizer.shutdown();
         mAssistant.shutdown();
@@ -118,9 +124,8 @@ public class BlindAssistantService extends Service {
     private void showNotification() {
         // The PendingIntent to launch our activity if the user selects this notification
         PendingIntent contentIntent =
-                PendingIntent
-                        .getActivity(this, 0,
-                                new Intent(this, VoicePromptActivity.class), 0);
+                PendingIntent.getActivity(this, 0,
+                                new Intent(this, VoicePromptActivity.class), PendingIntent.FLAG_ONE_SHOT);
 
         // Set the icon, scrolling text and timestamp
         Notification notification = new Notification.Builder(this)
@@ -135,6 +140,7 @@ public class BlindAssistantService extends Service {
     }
 
     public void shutdown() {
+        this.stopForeground(true);
         this.stopSelf();
     }
 
@@ -159,6 +165,8 @@ public class BlindAssistantService extends Service {
 
         @Override
         public void onReadyForSpeech(Bundle bundle) {
+            say("ready");
+
             if (recognitionListener != null) {
                 recognitionListener.onReadyForSpeech(bundle);
             }

@@ -23,18 +23,34 @@
         <activity
             android:name=".activities.VoicePromptActivity"
             android:screenOrientation="portrait"
-            android:label="Voice Prompt">
+            android:label="Blind Assistant">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
+
+        <activity
+            android:name=".activities.VoiceInputActivity"
+            android:label="Voice Input" >
+            <!--
+                Uncomment below to allow for the app. to listen to BT call button,
+                please note that this is unstable.
+            -->
+
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.VOICE_COMMAND"/>-->
+                <!--<category android:name="android.intent.category.DEFAULT"/>-->
+            <!--</intent-filter>-->
+        </activity>
+
         <service android:name=".services.BlindAssistantService"/>
         <service android:name=".services.WalkingDirectionsUpdateService"/>
 
         <receiver android:name=".receivers.MediaButtonIntentReceiver">
-            <intent-filter>
+            <intent-filter android:priority="1000">
                 <action android:name="android.intent.action.MEDIA_BUTTON"/>
             </intent-filter>
         </receiver>

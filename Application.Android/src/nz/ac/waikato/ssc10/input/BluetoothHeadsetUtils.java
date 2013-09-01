@@ -486,6 +486,12 @@ public abstract class BluetoothHeadsetUtils {
             // First stick calls always returns false. The second stick
             // always returns true if the countDownInterval is set to 1000.
             // It is somewhere in between 500 to a 1000.
+            if (mBluetoothHeadset.stopVoiceRecognition(mConnectedHeadset)) {
+                Log.d(TAG, "Got a TRUE stopVoiceRecognition");
+            } else {
+                Log.d(TAG, "Got a FALSE stopVoiceRecognition");
+            }
+
             if (mBluetoothHeadset.startVoiceRecognition(mConnectedHeadset)) {
                 Log.d(TAG, "Expect the STATE_AUDIO_CONNECTED event");
             } else {
@@ -499,7 +505,12 @@ public abstract class BluetoothHeadsetUtils {
             // Calls to startVoiceRecognition in onStick are not successful.
             // Should implement something to inform user of this failure
             mIsCountDownOn = false;
-            Log.d(TAG, "\nonFinish fail to connect to headset audio"); //$NON-NLS-1$
+
+            if (mBluetoothHeadset.isAudioConnected(mConnectedHeadset)) {
+                Log.d(TAG, "\nCountdown finished but audio was already connected"); //$NON-NLS-1$
+            } else {
+                Log.d(TAG, "\nonFinish fail to connect to headset audio"); //$NON-NLS-1$
+            }
         }
     };
 

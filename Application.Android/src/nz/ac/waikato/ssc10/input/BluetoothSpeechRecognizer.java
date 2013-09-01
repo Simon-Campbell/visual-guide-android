@@ -53,7 +53,6 @@ public class BluetoothSpeechRecognizer {
      */
     public void stop() {
         speechRecognizer.cancel();
-
         isRecognizing = false;
     }
 

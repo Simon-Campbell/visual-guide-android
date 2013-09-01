@@ -5,6 +5,7 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:gravity="center_vertical|center_horizontal">
+
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -24,13 +25,4 @@
         android:textSize="@dimen/status_font_size"
         android:textStyle="italic"/>
 
-    <Button
-        android:layout_width="fill_parent"
-        android:layout_margin="16dp"
-        android:layout_height="@dimen/button_size"
-        android:text="@string/request_assistance"
-        android:id="@+id/request_assist_button"
-        android:height="@dimen/button_size"
-        android:longClickable="false"
-        android:importantForAccessibility="yes"/>
 </LinearLayout>

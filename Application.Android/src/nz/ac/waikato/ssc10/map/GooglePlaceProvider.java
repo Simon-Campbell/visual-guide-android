@@ -2,9 +2,8 @@ package nz.ac.waikato.ssc10.map;
 
 import android.location.Address;
 import android.location.Location;
-import android.os.Debug;
 import android.util.Log;
-import com.google.gson.Gson;
+import com.google.gson.*;
 import com.google.gson.annotations.SerializedName;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -12,18 +11,20 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * A place provider which describes places from Google.
  */
 public class GooglePlaceProvider implements PlaceProvider {
+    public static final String LOCATION_PROVIDER = "google-places";
     public final int DEFAULT_RADIUS = 1000;
     public final int MAX_RADIUS = 50000;
     public final int DEFAULT_RESULTS_LIMIT = 5;
@@ -63,6 +64,10 @@ public class GooglePlaceProvider implements PlaceProvider {
 
     @Override
     public List<Address> get(String description) throws IllegalStateException {
+        return get(description, this.resultLimit);
+    }
+
+    private List<Address> get(String description, int resultLimit) {
         if (description == null || description.equals("")) {
             throw new IllegalArgumentException("Description is null or the empty string");
         }
@@ -71,13 +76,30 @@ public class GooglePlaceProvider implements PlaceProvider {
             throw new IllegalStateException("This provider has not the from location set via setSearchFromLocation(Location)");
         }
 
+        List<Address> addresses = new ArrayList<Address>(resultLimit);
+
         try {
-            getResult(description);
+            int results = 0;
+            GooglePlacesCollection result = getResult(description);
+
+            for (GooglePlacesCollection.GooglePlace res : result.results) {
+                Address address = new Address(Locale.getDefault());
+                address.setLatitude(res.location.getLatitude());
+                address.setLongitude(res.location.getLongitude());
+                address.setFeatureName(res.name);
+                addresses.add(address);
+
+                if (++results >= resultLimit) {
+                    break;
+                }
+
+                Log.i("GooglePlaceProvider", "Found address and added it to list " + address);
+            }
         } catch (IOException ex) {
             ex.printStackTrace();
         }
 
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return addresses;
     }
 
     private List<BasicNameValuePair> getQueryParams(String description) {
@@ -90,8 +112,14 @@ public class GooglePlaceProvider implements PlaceProvider {
         return params;
     }
 
-    private GooglePlaceResult getResult(String description) throws IOException {
-        return (GooglePlaceResult) new Gson().fromJson(downloadStringContent(description), GooglePlaceResult.class);
+    private GooglePlacesCollection getResult(String description) throws IOException {
+        String content = downloadStringContent(description);
+
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(Location.class, new LocationDeserializer())
+                .create();
+
+        return gson.fromJson(content, GooglePlacesCollection.class);
     }
 
     private String downloadStringContent(String description) throws IOException {
@@ -130,23 +158,30 @@ public class GooglePlaceProvider implements PlaceProvider {
 
     @Override
     public Address getNearest(String description) throws IllegalStateException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return get(description, 1).get(0);
     }
 
-    private class GooglePlaceResult {
-        @SerializedName("results") private List<PlaceResult> results;
+    private class GooglePlacesCollection {
+        @SerializedName("results")
+        private List<GooglePlace> results;
 
-        public GooglePlaceResult() { }
+        public GooglePlacesCollection() {
 
-        private class PlaceResult {
+        }
+
+        /**
+         * A class describing a place from the Google Places
+         * API
+         */
+        public class GooglePlace {
+            @SerializedName("id")
+            private String id;
+
             @SerializedName("formatted_address")
             private String address;
 
             @SerializedName("geometry")
-            private PlacesLocation location;
-
-            @SerializedName("id")
-            private String id;
+            private Location location;
 
             @SerializedName("name")
             private String name;
@@ -154,13 +189,39 @@ public class GooglePlaceProvider implements PlaceProvider {
             @SerializedName("types")
             private List<String> types;
 
-            public PlaceResult() { }
+            public GooglePlace() {
 
-            private class PlacesLocation {
-                @SerializedName("location") LatLng location;
-
-                public PlacesLocation() { }
             }
+        }
+    }
+
+    /**
+     * A class that deserializes a JsonObject in the following form to
+     * a location object.
+     * {
+     * "location" : {
+     * "lat" : -37.789858,
+     * "lng" : 175.325949
+     * }
+     * }
+     */
+    public class LocationDeserializer implements JsonDeserializer<Location> {
+        @Override
+        public Location deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+            Location l = new Location(LOCATION_PROVIDER);
+
+            JsonObject location = jsonElement
+                    .getAsJsonObject()
+                    .get("location")
+                    .getAsJsonObject();
+
+            double latitude = location.get("lat").getAsDouble();
+            double longitude = location.get("lng").getAsDouble();
+
+            l.setLatitude(latitude);
+            l.setLongitude(longitude);
+
+            return l;
         }
     }
 }

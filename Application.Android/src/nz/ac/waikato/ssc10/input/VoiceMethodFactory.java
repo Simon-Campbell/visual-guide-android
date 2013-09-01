@@ -28,40 +28,42 @@ public class VoiceMethodFactory {
     private static final String TAG = "VoiceMethodFactory";
     private VoiceMethodMap voiceMethods = new VoiceMethodMap();
 
-    private VoiceMethod sayUserLocation = new VoiceMethod() {
+    private static VoiceMethod sayUserLocation = new VoiceMethod() {
         @Override
         public void invoke(BlindAssistant assistant, Map<String, String> arguments) {
             assistant.sayCurrentLocation();
         }
     };
-    private VoiceMethod stopNavigating = new VoiceMethod() {
+
+    private static VoiceMethod stopNavigating = new VoiceMethod() {
         @Override
         public void invoke(BlindAssistant assistant, Map<String, String> arguments) {
             assistant.navigateTo(null);
         }
     };
 
-    private VoiceMethod navigateUser = new VoiceMethod() {
+    private static VoiceMethod navigateUser = new VoiceMethod() {
         @Override
         public void invoke(BlindAssistant assistant, Map<String, String> arguments) {
             assistant.navigateTo(arguments.get("{Destination}"));
         }
     };
 
-    private VoiceMethod sayCompassDirection = new VoiceMethod() {
+    private static VoiceMethod sayCompassDirection = new VoiceMethod() {
         @Override
         public void invoke(BlindAssistant assistant, Map<String, String> arguments) {
             assistant.sayUserCompassDirection();
         }
     };
-    private VoiceMethod sayDistanceToNext = new VoiceMethod() {
+
+    private static VoiceMethod sayDistanceToNext = new VoiceMethod() {
         @Override
         public void invoke(BlindAssistant assistant, Map<String, String> arguments) {
-            assistant.say("say distance to next is not implemented");
+            assistant.sayDistanceToNextPoint();
         }
     };
 
-    private VoiceMethod sayDistanceToFinal = new VoiceMethod() {
+    private static VoiceMethod sayDistanceToFinal = new VoiceMethod() {
         @Override
         public void invoke(BlindAssistant assistant, Map<String, String> arguments) {
             assistant.say("say distance to final is not implemented");
@@ -69,23 +71,7 @@ public class VoiceMethodFactory {
     };
 
     private VoiceMethodFactory() {
-        voiceMethods.put("where am I", sayUserLocation);
 
-        voiceMethods.put("what is my compass direction", sayCompassDirection);
-        voiceMethods.put("what direction am I facing", sayCompassDirection);
-        voiceMethods.put("where am I facing", sayCompassDirection);
-
-        // TODO: Implement sayDistanceToFinal properly
-        voiceMethods.put("how far away am I from the final destination", sayDistanceToFinal);
-
-        // TODO: Implement sayDistanceToNext properly
-        voiceMethods.put("how far away am I from the next destination", sayDistanceToNext);
-
-        voiceMethods.put("take me to {Destination}", navigateUser);
-        voiceMethods.put("navigate to {Destination}", navigateUser);
-
-        voiceMethods.put("stop navigating", stopNavigating);
-        voiceMethods.put("stop navigation", stopNavigating);
     }
 
     public VoiceMethodFactory(InputStream is) throws IOException {
@@ -107,7 +93,46 @@ public class VoiceMethodFactory {
     }
 
     public static VoiceMethodFactory createStandardFactory() {
-        return new VoiceMethodFactory();
+        VoiceMethodFactory voiceMethodFactory = new VoiceMethodFactory();
+        VoiceMethodMap voiceMethods = voiceMethodFactory.voiceMethods;
+
+        //--------------------------------------------------------------------------------------------------------------
+        // sayUserLocation
+        //--------------------------------------------------------------------------------------------------------------
+        voiceMethods.put("where am I", sayUserLocation);
+
+        //--------------------------------------------------------------------------------------------------------------
+        // sayCompassDirection
+        //--------------------------------------------------------------------------------------------------------------
+        voiceMethods.put("what is my compass direction", sayCompassDirection);
+        voiceMethods.put("what direction am I facing", sayCompassDirection);
+        voiceMethods.put("where am I facing", sayCompassDirection);
+        voiceMethods.put("what way am I facing", sayCompassDirection);
+
+        //--------------------------------------------------------------------------------------------------------------
+        // sayDistanceToFinal - TODO: Needs implementing
+        //--------------------------------------------------------------------------------------------------------------
+        voiceMethods.put("how far away am I from the final destination", sayDistanceToFinal);
+
+        //--------------------------------------------------------------------------------------------------------------
+        // sayDistanceToNext
+        //--------------------------------------------------------------------------------------------------------------
+        voiceMethods.put("how far away is the next destination", sayDistanceToNext);
+        voiceMethods.put("how far away am I from the next destination", sayDistanceToNext);
+
+        //--------------------------------------------------------------------------------------------------------------
+        // navigateUser
+        //--------------------------------------------------------------------------------------------------------------
+        voiceMethods.put("take me to {Destination}", navigateUser);
+        voiceMethods.put("navigate to {Destination}", navigateUser);
+
+        //--------------------------------------------------------------------------------------------------------------
+        // stopNavigating
+        //--------------------------------------------------------------------------------------------------------------
+        voiceMethods.put("stop navigating", stopNavigating);
+        voiceMethods.put("stop navigation", stopNavigating);
+
+        return voiceMethodFactory;
     }
 
     public Pair<VoiceMethod, Map<String, String>> get(String input) {

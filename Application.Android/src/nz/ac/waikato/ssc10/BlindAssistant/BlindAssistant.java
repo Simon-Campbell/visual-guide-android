@@ -17,6 +17,7 @@ import nz.ac.waikato.ssc10.input.BluetoothHeadsetHelper;
 import nz.ac.waikato.ssc10.input.VoiceMethod;
 import nz.ac.waikato.ssc10.input.VoiceMethodFactory;
 import nz.ac.waikato.ssc10.map.GoogleWalkingDirections;
+import nz.ac.waikato.ssc10.map.LatLng;
 import nz.ac.waikato.ssc10.map.NoSuchRouteException;
 import nz.ac.waikato.ssc10.map.WalkingDirections;
 import nz.ac.waikato.ssc10.navigation.CompassProvider;
@@ -95,19 +96,19 @@ public class BlindAssistant implements NavigatorUpdateListener {
 
         if (destination != null) {
             final Location location = getCurrentLocation();
-            final String from;
+            final String stringFrom = getCurrentLocationName();
+
+            final WalkingDirectionsTask task;
 
             if (location != null) {
-                from = String.format("%f,%f", location.getLatitude(), location.getLongitude());
+                task = new WalkingDirectionsTask(location);
+
+                say("getting directions to " + destination);
+                task.execute(destination);
             } else {
-                from = getCurrentLocationName();
+                say("unable to get your location. please try again");
             }
 
-            final String to = destination + " New Zealand";
-            say("getting directions to " + destination);
-
-            WalkingDirectionsTask task = new WalkingDirectionsTask();
-            task.execute(from, to);
         } else {
             say("stopping navigation");
 
@@ -158,16 +159,28 @@ public class BlindAssistant implements NavigatorUpdateListener {
     }
 
     private class WalkingDirectionsTask extends AsyncTask<String, Double, WalkingDirections> {
+        private Location locationFrom = null;
+        private String stringFrom = null;
+
+        public WalkingDirectionsTask(Location from) {
+            this.locationFrom = from;
+            this.stringFrom = "your current location";
+        }
 
         @Override
         protected WalkingDirections doInBackground(String... strings) {
             WalkingDirections directions = null;
+
             try {
-                directions = new GoogleWalkingDirections(strings[0], strings[1]);
+                if (locationFrom != null) {
+                    directions = new GoogleWalkingDirections(locationFrom, strings[0]);
+                } else {
+                    throw new NoSuchRouteException("no location was specified");
+                }
             } catch (NoSuchRouteException ex) {
                 Log.e(TAG, "A route was not able to be found", ex);
 
-                say("i was unable to route you from " + strings[0] + " to " + strings[1]);
+                say("i was unable to route you from " + stringFrom + " to " + strings[0]);
             } finally {
                 return directions;
             }
@@ -179,6 +192,11 @@ public class BlindAssistant implements NavigatorUpdateListener {
         }
     }
 
+    /**
+     * Say the specified text as an instruction
+     *
+     * @param instruction The text to say as an instruction
+     */
     public void sayInstruction(String instruction) {
         HashMap<String, String> params = null;
 
@@ -190,6 +208,57 @@ public class BlindAssistant implements NavigatorUpdateListener {
         tts.speak(instruction, TextToSpeech.QUEUE_FLUSH, params);
     }
 
+    /**
+     * If the user is navigating then say the distance to the next point in the navigation route. If they are not
+     * navigating then say that they are not currently navigating.
+     */
+    public void sayDistanceToNextPoint() {
+        Location now = locationClient.getLastLocation();
+        NavigationStep current = navigator.getCurrentStep();
+
+        if (current != null) {
+            LatLng next = current.getEndLocation();
+
+            float[] results = new float[1];
+            Location.distanceBetween(now.getLatitude(), now.getLongitude(), next.getLatitude(), next.getLongitude(), results);
+
+            // Round the result because it is irrelevant to the user how many cm they are
+            // away from the destination (too much information)
+            int distance = Math.round(results[0]);
+            say("the next destination is " + distance + " meters away");
+        } else {
+            say("you are not currently navigating");
+        }
+    }
+
+    /**
+     * If the user is navigating then say the distance to the last (end) point in the navigation route. If they are not
+     * navigating then say that they are not currently navigating.
+     */
+    public void sayDistanceToEnd() {
+        Location now = locationClient.getLastLocation();
+        NavigationStep current = navigator.getCurrentStep();
+
+        if (current != null) {
+            LatLng next = current.getEndLocation();
+
+            float[] results = new float[1];
+            Location.distanceBetween(now.getLatitude(), now.getLongitude(), next.getLatitude(), next.getLongitude(), results);
+
+            // Round the result because it is irrelevant to the user how many cm they are
+            // away from the destination (too much information)
+            int distance = Math.round(results[0]);
+            say("the final destination is at least " + distance + " meters away");
+        } else {
+            say("you are not currently navigating");
+        }
+    }
+
+    /**
+     * Assist the user with a request string from the user
+     *
+     * @param request The request from the user
+     */
     public void assist(String request) {
         Log.d(TAG, "The blind assistant is assisting the user with the request " + request);
 

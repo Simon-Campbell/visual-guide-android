@@ -1,5 +1,6 @@
 package nz.ac.waikato.ssc10.navigation;
 
+import android.location.Location;
 import nz.ac.waikato.ssc10.map.LatLng;
 
 /**
@@ -32,11 +33,11 @@ public interface NavigationStep {
      * Get the location that this step will start on
      * @return A LatLng object for the start of the step
      */
-    LatLng getStartLocation();
+    Location getStartLocation();
 
     /**
      * Get the location that this step will end on
      * @return A LatLng object for the end of the step
      */
-    LatLng getEndLocation();
+    Location getEndLocation();
 }

@@ -3,7 +3,7 @@ package nz.ac.waikato.ssc10.map;
 import android.location.Address;
 import android.location.Location;
 import nz.ac.waikato.ssc10.navigation.NavigationStep;
-import nz.ac.waikato.ssc10.navigation.TimedNavigationStep;
+import nz.ac.waikato.ssc10.navigation.WalkingNavigationStep;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -194,7 +194,7 @@ public class GoogleWalkingDirections implements WalkingDirections {
         String instructions = jsonObject.getString("html_instructions");
         String travelMode = jsonObject.getString("travel_mode");
 
-        return new TimedNavigationStep(distance.getInt("value"), duration.getInt("value"), endLocation, startLocation, instructions, travelMode);
+        return new WalkingNavigationStep(distance.getInt("value"), duration.getInt("value"), endLocation, startLocation, instructions, travelMode);
     }
 
     private static LatLng getLatLngFromJson(JSONObject jsonObject) throws JSONException {

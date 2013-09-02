@@ -30,10 +30,12 @@ public class FileBasedAssistanceProvider {
                 String[] fields = line.split(",");
 
                 if (fields[0].equalsIgnoreCase(PEDESTRIAN_CROSSING_TYPE)) {
-                    LatLng start = new LatLng(Double.valueOf(fields[1]), Double.valueOf(fields[2]));
-                    LatLng end = new LatLng(Double.valueOf(fields[3]), Double.valueOf(fields[4]));
+                    String thoroughFare = fields[1];
 
-                    steps.add(new PedestrianCrossing(start, end));
+                    LatLng start = new LatLng(Double.valueOf(fields[2]), Double.valueOf(fields[3]));
+                    LatLng end = new LatLng(Double.valueOf(fields[4]), Double.valueOf(fields[5]));
+
+                    steps.add(new PedestrianCrossing(thoroughFare, start, end));
                 }
             }
         } finally {
@@ -57,8 +59,8 @@ public class FileBasedAssistanceProvider {
         List<NavigationStep> view = new ArrayList<NavigationStep>(steps.size());
 
         for (NavigationStep s: steps) {
-            LatLng start = s.getStartLocation();
-            LatLng end = s.getEndLocation();
+            LatLng start = LatLng.fromLocation(s.getStartLocation());
+            LatLng end = LatLng.fromLocation(s.getEndLocation());
 
             if (isPointInRange(start, northWest, southEast) || isPointInRange(end, northWest, southEast)) {
                 view.add(s);

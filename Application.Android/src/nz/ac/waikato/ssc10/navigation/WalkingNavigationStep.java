@@ -1,16 +1,18 @@
 package nz.ac.waikato.ssc10.navigation;
 
+import android.location.Location;
 import nz.ac.waikato.ssc10.map.LatLng;
 
 /**
- * A class which describes a navigation step
+ * A class which describes a standard walking navigation step from
+ * A to B.
  */
-public class TimedNavigationStep implements NavigationStep {
+public class WalkingNavigationStep implements NavigationStep {
     private int distanceValue;
     private int durationValue;
 
-    private LatLng endLocation;
-    private LatLng startLocation;
+    private Location endLocation;
+    private Location startLocation;
 
     private String instruction;
     private String travelMode;
@@ -18,11 +20,11 @@ public class TimedNavigationStep implements NavigationStep {
     private NavigationStep next;
     private NavigationStep previous;
 
-    public TimedNavigationStep(int distanceValue, int durationValue, LatLng endLocation, LatLng startLocation, String instruction, String travelMode) {
+    public WalkingNavigationStep(int distanceValue, int durationValue, LatLng endLocation, LatLng startLocation, String instruction, String travelMode) {
         this.distanceValue = distanceValue;
         this.durationValue = durationValue;
-        this.endLocation = endLocation;
-        this.startLocation = startLocation;
+        this.endLocation = endLocation.toLocation();
+        this.startLocation = startLocation.toLocation();
         this.instruction = instruction;
         this.travelMode = travelMode;
     }
@@ -51,12 +53,12 @@ public class TimedNavigationStep implements NavigationStep {
     }
 
     @Override
-    public LatLng getStartLocation() {
+    public Location getStartLocation() {
         return startLocation;
     }
 
     @Override
-    public LatLng getEndLocation() {
+    public Location getEndLocation() {
         return endLocation;
     }
 }

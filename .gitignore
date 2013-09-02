@@ -1,1 +1,4 @@
 Application.Android/.idea
+Application.Android/gen
+.idea
+out

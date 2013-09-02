@@ -194,8 +194,8 @@ public class IncrementalNavigator {
                 NavigationStep next = currentIdx + 1 < steps.size() ? steps.get(currentIdx + 1) : null;
 
                 if (current != null) {
-                    LatLng endLatLng = current.getEndLocation();
-                    final float distanceTo = getDistanceTo(location, endLatLng);
+                    Location endStepLocation = current.getEndLocation();
+                    final float distanceTo = getDistanceTo(location, endStepLocation);
 
                     if (distanceTo < UPDATE_DISTANCE_THRESH) {
                         currentIdx++;
@@ -218,7 +218,7 @@ public class IncrementalNavigator {
                     // user is walking away from the next point by doing
                     // a distance check
                     if (next != null) {
-                        float diff = getDistanceTo(anchorLocation, endLatLng) - distanceTo;
+                        float diff = getDistanceTo(anchorLocation, endStepLocation) - distanceTo;
 
                         if (diff > MOVE_DISTANCE_THRESH) {
                             anchorLocation = location;
@@ -241,7 +241,7 @@ public class IncrementalNavigator {
             }
         }
 
-        private float getDistanceTo(Location from, LatLng to) {
+        private float getDistanceTo(Location from, Location to) {
             float[] res = new float[1];
             Location.distanceBetween(from.getLatitude(), from.getLongitude(), to.getLatitude(), to.getLongitude(), res);
             return res[0];
@@ -335,7 +335,7 @@ public class IncrementalNavigator {
         }
     }
 
-    public Location getLastLocation() {
+    public Location getLocation() {
         return this.locationClient.getLastLocation();
     }
 
@@ -346,7 +346,7 @@ public class IncrementalNavigator {
                 .getInstruction();
     }
 
-    private LatLng getLastCheckpoint() {
+    private Location getLastCheckpoint() {
         return walkingDirections
                 .getSteps()
                 .get(currentIdx)
@@ -373,8 +373,8 @@ public class IncrementalNavigator {
         return current;
     }
 
-    private LatLng getNextCheckpoint() {
-        LatLng next = null;
+    private Location getNextCheckpoint() {
+        Location next = null;
         List<NavigationStep> steps = walkingDirections.getSteps();
 
         if (currentIdx < steps.size()) {

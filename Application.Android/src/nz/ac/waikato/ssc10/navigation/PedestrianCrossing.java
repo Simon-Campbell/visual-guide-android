@@ -1,21 +1,60 @@
 package nz.ac.waikato.ssc10.navigation;
 
+import android.location.Location;
 import nz.ac.waikato.ssc10.map.LatLng;
 
 /**
- * Created with IntelliJ IDEA.
- * User: Simon
- * Date: 20/07/13
- * Time: 6:11 PM
- * To change this template use File | Settings | File Templates.
+ * A step that involves a pedestrian crossing.
  */
 public class PedestrianCrossing implements NavigationStep {
-    private LatLng start;
-    private LatLng end;
+    public static final double DEFAULT_DISTANCE_THRESHOLD = 1.0f;
 
-    public PedestrianCrossing(LatLng start, LatLng end) {
-        this.start = start;
-        this.end = end;
+    private String thoroughFare;
+
+    private Location pt1;
+    private Location pt2;
+
+    private double distanceThreshold;
+
+    /**
+     * Create a pedestrian crossing object on the following thoroughfare at
+     * points pt1 and pt2
+     * @param thoroughFare The thoroughfare (e.g. street) that the crossing is
+     *                     on
+     * @param pt1 One side of the crossing
+     * @param pt2 The other side of the crossing
+     */
+    public PedestrianCrossing(String thoroughFare, LatLng pt1, LatLng pt2) {
+        this.thoroughFare = thoroughFare;
+        this.distanceThreshold = DEFAULT_DISTANCE_THRESHOLD;
+        this.pt1 = pt1.toLocation();
+        this.pt2 = pt2.toLocation();
+    }
+
+    /**
+     * Indicates whether this object is touched by the navigator
+     * @param navigator The navigator for the person that you would like to check
+     *                  is touching, or not touching this navigation point.
+     * @return  True if the pedestrian crossing is touched by a person at the specified
+     *          location.
+     */
+    public boolean touchedBy(IncrementalNavigator navigator) {
+        Location l  = navigator.getLocation();
+        float[] f   = new float[1];
+
+        Location.distanceBetween(l.getLatitude(), l.getLongitude(), pt1.getLatitude(), pt1.getLongitude(), f);
+
+        if (f[0] < distanceThreshold) {
+            return true;
+        }
+
+        Location.distanceBetween(l.getLatitude(), l.getLongitude(), pt2.getLatitude(), pt2.getLongitude(), f);
+
+        if (f[0] < distanceThreshold) {
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -34,13 +73,13 @@ public class PedestrianCrossing implements NavigationStep {
     }
 
     @Override
-    public LatLng getStartLocation() {
-        return start;
+    public Location getStartLocation() {
+        return pt1;
     }
 
     @Override
-    public LatLng getEndLocation() {
-        return end;
+    public Location getEndLocation() {
+        return pt2;
     }
 
     @Override
@@ -50,16 +89,16 @@ public class PedestrianCrossing implements NavigationStep {
 
         PedestrianCrossing that = (PedestrianCrossing) o;
 
-        if (!end.equals(that.end)) return false;
-        if (!start.equals(that.start)) return false;
+        if (!pt2.equals(that.pt2)) return false;
+        if (!pt1.equals(that.pt1)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = start.hashCode();
-        result = 31 * result + end.hashCode();
+        int result = pt1.hashCode();
+        result = 31 * result + pt2.hashCode();
         return result;
     }
 }

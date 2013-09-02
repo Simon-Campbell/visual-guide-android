@@ -217,7 +217,7 @@ public class BlindAssistant implements NavigatorUpdateListener {
         NavigationStep current = navigator.getCurrentStep();
 
         if (current != null) {
-            LatLng next = current.getEndLocation();
+            Location next = current.getEndLocation();
 
             float[] results = new float[1];
             Location.distanceBetween(now.getLatitude(), now.getLongitude(), next.getLatitude(), next.getLongitude(), results);
@@ -240,7 +240,7 @@ public class BlindAssistant implements NavigatorUpdateListener {
         NavigationStep current = navigator.getCurrentStep();
 
         if (current != null) {
-            LatLng next = current.getEndLocation();
+            Location next = current.getEndLocation();
 
             float[] results = new float[1];
             Location.distanceBetween(now.getLatitude(), now.getLongitude(), next.getLatitude(), next.getLongitude(), results);
@@ -277,7 +277,7 @@ public class BlindAssistant implements NavigatorUpdateListener {
 
     private Location getCurrentLocation() {
         if (navigator != null) {
-            return navigator.getLastLocation();
+            return navigator.getLocation();
         }
 
         return null;
@@ -285,7 +285,7 @@ public class BlindAssistant implements NavigatorUpdateListener {
 
     public String getCurrentLocationName() {
         if (navigator != null) {
-            return getLocationName(navigator.getLastLocation());
+            return getLocationName(navigator.getLocation());
         } else {
             return "unknown";
         }

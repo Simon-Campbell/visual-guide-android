@@ -21,7 +21,7 @@ public class FileBasedAssistanceProviderTest {
         assertTrue("steps cannot be null", steps != null);
         assertTrue("steps should be size 2", steps.size() == 2);
 
-        final NavigationStep step1 = new PedestrianCrossing(new LatLng(100.0, 100.0), new LatLng(200.0, 200.0));
+        final NavigationStep step1 = new PedestrianCrossing("Silverdale Rd", new LatLng(100.0, 100.0), new LatLng(200.0, 200.0));
         assertTrue("step should be equal", steps.get(0).equals(step1));
     }
 
@@ -43,7 +43,7 @@ public class FileBasedAssistanceProviderTest {
         assertTrue("steps cannot be null", steps != null);
         assertTrue("steps should be size 1", steps.size() == 1);
 
-        final NavigationStep stepTest = new PedestrianCrossing(new LatLng(25.0, 25.0), new LatLng(25.0, 25.0));
+        final NavigationStep stepTest = new PedestrianCrossing("Silverdale Rd", new LatLng(25.0, 25.0), new LatLng(25.0, 25.0));
         assertTrue("step should be equal", steps.get(0).equals(stepTest));
     }
 }

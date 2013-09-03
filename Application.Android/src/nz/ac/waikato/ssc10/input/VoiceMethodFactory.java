@@ -70,6 +70,13 @@ public class VoiceMethodFactory {
         }
     };
 
+    private static VoiceMethod sayInstruction = new VoiceMethod() {
+        @Override
+        public void invoke(BlindAssistant assistant, Map<String, String> arguments) {
+            assistant.sayCurrentInstruction();
+        }
+    };
+
     private VoiceMethodFactory() {
 
     }
@@ -118,7 +125,18 @@ public class VoiceMethodFactory {
         // sayDistanceToNext
         //--------------------------------------------------------------------------------------------------------------
         voiceMethods.put("how far away is the next destination", sayDistanceToNext);
+        voiceMethods.put("how far away is the next step", sayDistanceToNext);
         voiceMethods.put("how far away am I from the next destination", sayDistanceToNext);
+        voiceMethods.put("how far away am I from the next step", sayDistanceToNext);
+        voiceMethods.put("what is the distance to the next destination", sayDistanceToNext);
+        voiceMethods.put("what is the distance to the next step", sayDistanceToNext);
+
+        //--------------------------------------------------------------------------------------------------------------
+        // sayCurrentInstruction
+        //--------------------------------------------------------------------------------------------------------------
+        voiceMethods.put("repeat the last instruction", sayInstruction);
+        voiceMethods.put("what is the last instruction", sayInstruction);
+        voiceMethods.put("what is the current instruction", sayInstruction);
 
         //--------------------------------------------------------------------------------------------------------------
         // navigateUser

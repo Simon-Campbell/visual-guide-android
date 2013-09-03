@@ -1,7 +1,11 @@
 package nz.ac.waikato.ssc10.map;
 
 import android.location.Location;
+import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.location.LocationListener;
+import nz.ac.waikato.ssc10.navigation.IncrementalNavigator;
 import nz.ac.waikato.ssc10.navigation.NavigationStep;
+import nz.ac.waikato.ssc10.navigation.PedestrianCrossing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,32 +21,37 @@ public class DisabilityWalkingDirections extends WalkingDirectionsDecorator {
 
     @Override
     public List<NavigationStep> getSteps() {
-        List<NavigationStep> steps = super.getSteps();
-        List<NavigationStep> aidPoints = getAidPoints();
-
-        return decorateSteps(steps, aidPoints);
+        return decorateSteps(super.getSteps(), getAidPoints());
     }
 
     @Override
     public WalkingDirections routeFrom(Location location) throws NoSuchRouteException {
-        return super.routeFrom(location);
+        return new DisabilityWalkingDirections(super.routeFrom(location));
     }
 
     private List<NavigationStep> getAidPoints() {
         List<NavigationStep> aidPoints = new ArrayList<NavigationStep>();
+
+        aidPoints.add(new PedestrianCrossing("Silverdale Rd", new LatLng(-37.790002, 175.325749), new LatLng(-37.789922, 175.32588)));
+        aidPoints.add(new PedestrianCrossing("Hillcrest Rd", new LatLng(-37.787851,175.319446), new LatLng(-37.787892,175.319573)));
+
         return aidPoints;
     }
 
     private List<NavigationStep> decorateSteps(List<NavigationStep> corePath, List<NavigationStep> aidPoints) {
+
         for (NavigationStep coreStep : corePath) {
-            List<NavigationStep> aidOnPath = findStepsNearPath(coreStep, aidPoints);
+            List<NavigationStep> aidOnPath = findStepsOnPath(coreStep, aidPoints);
         }
 
         return corePath;
     }
 
-    private List<NavigationStep> findStepsNearPath(NavigationStep step, List<NavigationStep> aidPoints) {
-        List<NavigationStep> nearPath = new ArrayList<NavigationStep>();
+    private List<NavigationStep> findStepsOnPath(NavigationStep step, List<NavigationStep> aidPoints) {
+        List<NavigationStep> onPath = new ArrayList<NavigationStep>();
+
+        for (NavigationStep aidStep : aidPoints) {
+        }
 
         return aidPoints;
     }

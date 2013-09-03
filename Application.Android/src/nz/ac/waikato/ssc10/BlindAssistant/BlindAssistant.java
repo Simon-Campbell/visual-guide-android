@@ -6,6 +6,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
@@ -46,6 +47,7 @@ public class BlindAssistant implements NavigatorUpdateListener {
     private Location lastLocation;
     private Context context;
     private TextToSpeech tts;
+    private ToneGenerator toneGenerator;
 
     private boolean isNavigating = false;
 
@@ -139,11 +141,19 @@ public class BlindAssistant implements NavigatorUpdateListener {
     }
 
     @Override
-    public void onNavigationStepChange(IncrementalNavigator guide, NavigationStep step) {
-        if (step != null) {
+    public void onNavigationStepChange(IncrementalNavigator guide, NavigationStep nextStep) {
+        if (nextStep != null) {
             sayInstruction(guide.getCurrentInstruction());
         } else {
             say("you have arrived at your destination");
+        }
+    }
+
+    public void sayCurrentInstruction() {
+        if (navigator != null) {
+            sayInstruction(navigator.getCurrentInstruction());
+        } else {
+            say("you are not currently navigating");
         }
     }
 

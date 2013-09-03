@@ -9,7 +9,7 @@ import nz.ac.waikato.ssc10.map.LatLng;
 public class PedestrianCrossing implements NavigationStep {
     public static final double DEFAULT_DISTANCE_THRESHOLD = 1.0f;
 
-    private String thoroughFare;
+    private String thoroughfare;
 
     private Location pt1;
     private Location pt2;
@@ -19,13 +19,13 @@ public class PedestrianCrossing implements NavigationStep {
     /**
      * Create a pedestrian crossing object on the following thoroughfare at
      * points pt1 and pt2
-     * @param thoroughFare The thoroughfare (e.g. street) that the crossing is
+     * @param thoroughfare The thoroughfare (e.g. street) that the crossing is
      *                     on
      * @param pt1 One side of the crossing
      * @param pt2 The other side of the crossing
      */
-    public PedestrianCrossing(String thoroughFare, LatLng pt1, LatLng pt2) {
-        this.thoroughFare = thoroughFare;
+    public PedestrianCrossing(String thoroughfare, LatLng pt1, LatLng pt2) {
+        this.thoroughfare = thoroughfare;
         this.distanceThreshold = DEFAULT_DISTANCE_THRESHOLD;
         this.pt1 = pt1.toLocation();
         this.pt2 = pt2.toLocation();
@@ -80,6 +80,10 @@ public class PedestrianCrossing implements NavigationStep {
     @Override
     public Location getEndLocation() {
         return pt2;
+    }
+
+    public String getThoroughfare() {
+        return thoroughfare;
     }
 
     @Override

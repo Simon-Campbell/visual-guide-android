@@ -7,6 +7,8 @@ import android.content.ServiceConnection;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -16,7 +18,7 @@ import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import nz.ac.waikato.ssc10.BlindAssistant.services.WalkingDirectionsUpdateService;
-import nz.ac.waikato.ssc10.map.LatLng;
+import nz.ac.waikato.ssc10.map.DisabilityWalkingDirections;
 import nz.ac.waikato.ssc10.map.NoSuchRouteException;
 import nz.ac.waikato.ssc10.map.WalkingDirections;
 
@@ -49,8 +51,10 @@ public class IncrementalNavigator {
     private static final int GEOCODE_PREFERRED_UPDATE_INTERVAL_MILLISECONDS =
             GEOCODE_PREFERRED_UPDATE_INTERVAL_SECONDS * MILLISECONDS_PER_SECOND;
 
-    private static final String TAG = "IncrementalNavigator";
+    private float headingBearing;
+    private float facingBearing;
 
+    private static final String TAG = "IncrementalNavigator";
     private final Handler directionsUpdateHandler = new Handler() {
         @Override
         public void handleMessage(Message message) {
@@ -69,30 +73,11 @@ public class IncrementalNavigator {
                     break;
             }
         }
-
-        ;
     };
 
     private final Messenger directionsUpdateMessenger = new Messenger(directionsUpdateHandler);
 
     private int currentIdx = 0;
-
-    /**
-     * The bearing that the phone is heading
-     */
-    private double headingBearing = 0.0;
-
-    /**
-     * The last calculated distance from the persons location to
-     * the next destination.
-     */
-    private double nextDestinationLength = 0.0;
-
-    /**
-     * The last calculated 'initial' bearing from the persons location
-     * to the next destination.
-     */
-    private double nextDestinationBearing = 0.0;
 
     private Queue<Location> movementHistory;
     private NavigatorUpdateListener navigatorUpdateListener;
@@ -104,149 +89,14 @@ public class IncrementalNavigator {
     private CompassProvider compassProvider;
 
     private WalkingDirections walkingDirections;
+    private DisabilityWalkingDirections disabilityWalkingDirections;
 
-    private LocationListener locationListener = new LocationListener() {
-        private Location anchorLocation = null;
+    private LocationListener locationListener = new IncrementalNavigatorLocationListener();
+    private ToneGenerator toneGenerator;
 
-        private Address lastGeocodeAddress = null;
-        private long lastGeocodeUpdate = 0;
-
-        private static final double MOVE_DISTANCE_THRESH = 2.5;
-        private static final double UPDATE_DISTANCE_THRESH = 10.0;
-
-        /**
-         * Detect a street change based on the passed location
-         * @param l The new location to compare to the previous
-         *          location and thus detect a street change.
-         */
-        private void detectStreetChange(Location l) {
-            long now = System.currentTimeMillis();
-
-            Log.d(TAG, "Detecting street change for location " + l);
-
-            // If the time difference is greater than the preferred time
-            // then we'll do a check
-            if ((now - lastGeocodeUpdate) > GEOCODE_PREFERRED_UPDATE_INTERVAL_MILLISECONDS) {
-
-                try {
-                    List<Address> results = geocoder.getFromLocation(l.getLatitude(), l.getLongitude(), 1);
-
-                    Log.i(TAG, "Geocoder returned " + results.size() + " results");
-
-                    if (results != null && results.size() != 0) {
-                        Address currentAddress = results.get(0);
-
-                        Log.i(TAG, "Current address is " + currentAddress);
-
-                        if (lastGeocodeAddress == null) {
-                            lastGeocodeAddress = currentAddress;
-                        } else {
-                            String current = currentAddress.getThoroughfare();
-                            String last = lastGeocodeAddress.getThoroughfare();
-
-                            // TODO: This should be negated...!!
-                            if (!current.equals(last)) {
-                                Log.d(TAG, "The street has changed from " + last + " to " + current);
-
-                                Intent intent = new Intent(context, WalkingDirectionsUpdateService.class);
-                                intent.setAction(WalkingDirectionsUpdateService.ACTION_UPDATE_ROUTE);
-
-                                intent.putExtra(WalkingDirectionsUpdateService.EXTRA_LOCATION, l);
-                                intent.putExtra(WalkingDirectionsUpdateService.EXTRA_MESSENGER, directionsUpdateMessenger);
-
-                                if (walkingDirectionsUpdateService != null) {
-                                    walkingDirectionsUpdateService.startService(intent);
-                                } else {
-                                    Log.e(TAG, "No instance of the service was available to start.");
-                                }
-
-                            }
-
-                            lastGeocodeAddress = currentAddress;
-                        }
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    lastGeocodeUpdate = System.currentTimeMillis();
-                }
-            }
-        }
-
-        @Override
-        public void onLocationChanged(Location location) {
-            Log.d(TAG, "The location has changed to " + location.toString());
-
-            if (anchorLocation == null) {
-                anchorLocation = location;
-            }
-
-            if (location.hasBearing()) {
-                headingBearing = location.getBearing();
-            }
-
-            detectStreetChange(location);
-
-            if (navigatorUpdateListener != null && walkingDirections != null) {
-                List<NavigationStep> steps = walkingDirections.getSteps();
-
-                NavigationStep current = steps.get(currentIdx);
-                NavigationStep next = currentIdx + 1 < steps.size() ? steps.get(currentIdx + 1) : null;
-
-                if (current != null) {
-                    Location endStepLocation = current.getEndLocation();
-                    final float distanceTo = getDistanceTo(location, endStepLocation);
-
-                    if (distanceTo < UPDATE_DISTANCE_THRESH) {
-                        currentIdx++;
-
-                        navigatorUpdateListener.onNavigationStepChange(IncrementalNavigator.this, next);
-
-                        // If we have no more steps to get to then,
-                        // we'll kill the updates.
-
-                        // TODO: Make sure that no more updates happen after
-                        // this.
-                        if (next == null) {
-                            locationClient.removeLocationUpdates(locationListener);
-
-                            anchorLocation = null;
-                        }
-                    }
-
-                    // If we are still navigating then we will check if the
-                    // user is walking away from the next point by doing
-                    // a distance check
-                    if (next != null) {
-                        float diff = getDistanceTo(anchorLocation, endStepLocation) - distanceTo;
-
-                        if (diff > MOVE_DISTANCE_THRESH) {
-                            anchorLocation = location;
-                        } else if (diff < -MOVE_DISTANCE_THRESH) {
-                            anchorLocation = location;
-
-                            navigatorUpdateListener.onMoveFromPath(IncrementalNavigator.this, 0.0);
-                        }
-                    }
-                }
-
-            }
-
-            // Offer the location to the history queue, if
-            // it fails then try removing the head and then
-            // adding it.
-            if (!movementHistory.offer(location)) {
-                movementHistory.remove();
-                movementHistory.add(location);
-            }
-        }
-
-        private float getDistanceTo(Location from, Location to) {
-            float[] res = new float[1];
-            Location.distanceBetween(from.getLatitude(), from.getLongitude(), to.getLatitude(), to.getLongitude(), res);
-            return res[0];
-        }
-    };
+    public void beep() {
+        toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP);
+    }
 
     public IncrementalNavigator(Context context, LocationClient locationClient, CompassProvider compassProvider, Geocoder geocoder) {
         this.context = context;
@@ -254,6 +104,7 @@ public class IncrementalNavigator {
 
         this.compassProvider = compassProvider;
         this.geocoder = geocoder;
+        this.toneGenerator = new ToneGenerator(AudioManager.STREAM_VOICE_CALL, ToneGenerator.MAX_VOLUME);
 
         this.locationRequest = LocationRequest.create();
         this.locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -304,6 +155,7 @@ public class IncrementalNavigator {
 
     public void shutdown() {
         this.locationClient.removeLocationUpdates(locationListener);
+        this.toneGenerator.release();
         this.unbindUpdateService();
     }
 
@@ -340,17 +192,13 @@ public class IncrementalNavigator {
     }
 
     public String getCurrentInstruction() {
-        return walkingDirections
-                .getSteps()
-                .get(currentIdx)
-                .getInstruction();
-    }
+        NavigationStep current = getCurrentStep();
 
-    private Location getLastCheckpoint() {
-        return walkingDirections
-                .getSteps()
-                .get(currentIdx)
-                .getStartLocation();
+        if (current != null) {
+            return current.getInstruction();
+        } else {
+            return "";
+        }
     }
 
     /**
@@ -373,6 +221,21 @@ public class IncrementalNavigator {
         return current;
     }
 
+    public NavigationStep getNextStep() {
+        NavigationStep next = null;
+
+        if (walkingDirections != null) {
+            int nextIdx = (currentIdx + 1);
+            List<NavigationStep> steps = walkingDirections.getSteps();
+
+            if (nextIdx >= 0 && nextIdx < steps.size()) {
+                next = steps.get(nextIdx);
+            }
+        }
+
+        return next;
+    }
+
     private Location getNextCheckpoint() {
         Location next = null;
         List<NavigationStep> steps = walkingDirections.getSteps();
@@ -384,8 +247,214 @@ public class IncrementalNavigator {
         return next;
     }
 
-    private int getNextRouteIndex() {
-        return currentIdx + 1;
-    }
+    private class IncrementalNavigatorLocationListener implements LocationListener {
+        private Location anchorLocation = null;
 
+        private Address lastGeocodeAddress = null;
+
+        private long lastGeocodeUpdate = 0;
+        private long lastBeepTime = 0;
+
+        private static final double MOVE_DISTANCE_THRESH = 2.5;
+        private static final double UPDATE_DISTANCE_THRESH = 10.0;
+
+        /**
+         * Detect a thoroughfare change based on the passed location
+         * @param location The new location to compare to the previous
+         *                 location and thus detect a street change.
+         */
+        private void detectThoroughfareChange(Location location) {
+            assert location != null;
+
+            Log.d(TAG, "Detecting street change for location " + location);
+
+            if (hasThoroughfareUpdateThresholdPassed()) {
+                Address currentAddress = getAddress(location);
+
+                if (currentAddress != null) {
+                    Log.i(TAG, "Current address is " + currentAddress);
+
+                    if (lastGeocodeAddress != null && isThoroughfareDifferent(currentAddress)) {
+                        onThoroughfareChange(location, currentAddress.getThoroughfare(), lastGeocodeAddress.getThoroughfare());
+                    }
+
+                    lastGeocodeAddress = currentAddress;
+                }
+
+                lastGeocodeUpdate = System.currentTimeMillis();
+            }
+        }
+
+        private Address getAddress(Location location) {
+            assert location != null;
+            Address currentAddress = null;
+
+            try
+            {
+                List<Address> results = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+
+                if (results != null && results.size() != 0) {
+                    currentAddress = results.get(0);
+                } else {
+                    Log.w(TAG, "No address was found for the specified location " + location);
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+
+                currentAddress = null;
+            }
+
+            return currentAddress;
+        }
+
+        /**
+         * Checks if the update threshold for thoroughfare updates has passed. This is essential so that
+         * the geolocation limit is not exceeded.
+         * @return True if the threshold period has passed (do an update), false otherwise
+         */
+        private boolean hasThoroughfareUpdateThresholdPassed() {
+            long now = System.currentTimeMillis();
+            return (now - lastGeocodeUpdate) > GEOCODE_PREFERRED_UPDATE_INTERVAL_MILLISECONDS;
+        }
+
+        private boolean isThoroughfareDifferent(Address currentAddress) {
+            assert currentAddress != null;
+
+            if (lastGeocodeAddress != null) {
+                String current = currentAddress.getThoroughfare();
+                String last = lastGeocodeAddress.getThoroughfare();
+
+                return (!current.equals(last));
+            }
+
+            return true;
+        }
+
+        private void onThoroughfareChange(Location l, String current, String previous) {
+            Log.d(TAG, "The street has changed from " + previous + " to " + current);
+
+            startWalkingDirectionsUpdateService(l);
+        }
+
+        private void startWalkingDirectionsUpdateService(Location rerouteFrom) {
+            assert rerouteFrom != null;
+
+            Intent intent = new Intent(context, WalkingDirectionsUpdateService.class);
+            intent.setAction(WalkingDirectionsUpdateService.ACTION_UPDATE_ROUTE);
+
+            intent.putExtra(WalkingDirectionsUpdateService.EXTRA_LOCATION, rerouteFrom);
+            intent.putExtra(WalkingDirectionsUpdateService.EXTRA_MESSENGER, directionsUpdateMessenger);
+
+            if (walkingDirectionsUpdateService != null) {
+                walkingDirectionsUpdateService.startService(intent);
+            } else {
+                Log.e(TAG, "No instance of the service was available to start.");
+            }
+        }
+
+        private boolean hasBeepThresholdPassed(float distance) {
+            long now = System.currentTimeMillis();
+
+            final double Ca = 90.0;
+            final int Ddiff = 0;
+            final double R = Math.PI;
+
+            double periodMilliseconds = (1000 * ((distance * (distance/R)) / Ca)) - Ddiff;
+
+            return (now - lastBeepTime) > periodMilliseconds;
+        }
+
+        @Override
+        public void onLocationChanged(Location location) {
+            Log.d(TAG, "The location has changed to " + location.toString());
+
+            if (anchorLocation == null) {
+                anchorLocation = location;
+            }
+
+            if (location.hasBearing()) {
+                headingBearing = location.getBearing();
+            }
+
+            detectThoroughfareChange(location);
+
+            if (navigatorUpdateListener != null && walkingDirections != null) {
+                NavigationStep current = getCurrentStep();
+
+                if (current != null) {
+                    final float distanceTo = getDistanceTo(location, current.getEndLocation());
+
+                    if (hasBeepThresholdPassed(distanceTo)) {
+                        beep();
+
+                        lastBeepTime = System.currentTimeMillis();
+                    }
+
+                    detectStepChange(distanceTo);
+                    detectMovementFromNextStep(location, distanceTo);
+                }
+
+            }
+
+            // Offer the location to the history queue, if
+            // it fails then try removing the head and then
+            // adding it.
+            if (!movementHistory.offer(location)) {
+                movementHistory.remove();
+                movementHistory.add(location);
+            }
+        }
+
+        private void detectMovementFromNextStep(Location location, float distanceTo) {
+            // If we are still navigating then we will check if the
+            // user is walking away from the next point by doing
+            // a distance check
+            NavigationStep current = getCurrentStep();
+            NavigationStep next = getNextStep();
+
+            if (current != null && next != null) {
+                float diff = getDistanceTo(anchorLocation, current.getEndLocation()) - distanceTo;
+
+                if (diff > MOVE_DISTANCE_THRESH) {
+                    anchorLocation = location;
+                } else if (diff < -MOVE_DISTANCE_THRESH) {
+                    anchorLocation = location;
+
+                    navigatorUpdateListener.onMoveFromPath(IncrementalNavigator.this, 0.0);
+                }
+            }
+        }
+
+        private void detectStepChange(float distanceTo) {
+            NavigationStep next = getNextStep();
+
+            if (isNextStepNearby(distanceTo)) {
+                currentIdx++;
+
+                navigatorUpdateListener.onNavigationStepChange(IncrementalNavigator.this, next);
+
+                // If we have no more steps to get to then,
+                // we'll kill the updates.
+                if (next == null) {
+                    stopNavigating();
+                }
+            }
+        }
+
+        private void stopNavigating() {
+            locationClient.removeLocationUpdates(locationListener);
+
+            anchorLocation = null;
+        }
+
+        private boolean isNextStepNearby(float distanceTo) {
+            return distanceTo < UPDATE_DISTANCE_THRESH;
+        }
+
+        private float getDistanceTo(Location from, Location to) {
+            float[] res = new float[1];
+            Location.distanceBetween(from.getLatitude(), from.getLongitude(), to.getLatitude(), to.getLongitude(), res);
+            return res[0];
+        }
+    }
 }

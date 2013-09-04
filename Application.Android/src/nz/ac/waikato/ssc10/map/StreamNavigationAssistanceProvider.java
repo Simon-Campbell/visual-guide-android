@@ -4,23 +4,24 @@ import nz.ac.waikato.ssc10.navigation.NavigationStep;
 import nz.ac.waikato.ssc10.navigation.PedestrianCrossing;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FileBasedAssistanceProvider {
+public class StreamNavigationAssistanceProvider {
     public static final String PEDESTRIAN_CROSSING_TYPE = "PEDESTRIAN_CROSSING";
     public static final String COMMENT_TOKEN = ";";
 
     public List<NavigationStep> steps = new ArrayList<NavigationStep>();
 
-    public FileBasedAssistanceProvider(String filePath) throws IOException {
+    public StreamNavigationAssistanceProvider(InputStream stream) throws IOException {
         BufferedReader br = null;
         String line = null;
 
         try {
-            br = new BufferedReader(new FileReader(filePath));
+            br = new BufferedReader(new InputStreamReader(stream));
 
             while ((line = br.readLine()) != null) {
                 if (line.startsWith(COMMENT_TOKEN)) {
@@ -51,6 +52,7 @@ public class FileBasedAssistanceProvider {
     /**
      * Returns the steps where any part of the step falls within the specified latitude
      * boundaries
+     *
      * @param northWest The north west latitude boundary
      * @param southEast The south east latitude boundary
      * @return A list of points within the boundaries
@@ -58,7 +60,7 @@ public class FileBasedAssistanceProvider {
     public List<NavigationStep> getSteps(LatLng northWest, LatLng southEast) {
         List<NavigationStep> view = new ArrayList<NavigationStep>(steps.size());
 
-        for (NavigationStep s: steps) {
+        for (NavigationStep s : steps) {
             LatLng start = LatLng.fromLocation(s.getStartLocation());
             LatLng end = LatLng.fromLocation(s.getEndLocation());
 

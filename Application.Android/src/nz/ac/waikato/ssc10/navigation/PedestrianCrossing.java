@@ -19,10 +19,11 @@ public class PedestrianCrossing implements NavigationStep {
     /**
      * Create a pedestrian crossing object on the following thoroughfare at
      * points pt1 and pt2
+     *
      * @param thoroughfare The thoroughfare (e.g. street) that the crossing is
      *                     on
-     * @param pt1 One side of the crossing
-     * @param pt2 The other side of the crossing
+     * @param pt1          One side of the crossing
+     * @param pt2          The other side of the crossing
      */
     public PedestrianCrossing(String thoroughfare, LatLng pt1, LatLng pt2) {
         this.thoroughfare = thoroughfare;
@@ -33,14 +34,15 @@ public class PedestrianCrossing implements NavigationStep {
 
     /**
      * Indicates whether this object is touched by the navigator
+     *
      * @param navigator The navigator for the person that you would like to check
      *                  is touching, or not touching this navigation point.
-     * @return  True if the pedestrian crossing is touched by a person at the specified
-     *          location.
+     * @return True if the pedestrian crossing is touched by a person at the specified
+     *         location.
      */
     public boolean touchedBy(IncrementalNavigator navigator) {
-        Location l  = navigator.getLocation();
-        float[] f   = new float[1];
+        Location l = navigator.getLocation();
+        float[] f = new float[1];
 
         Location.distanceBetween(l.getLatitude(), l.getLongitude(), pt1.getLatitude(), pt1.getLongitude(), f);
 
@@ -93,10 +95,25 @@ public class PedestrianCrossing implements NavigationStep {
 
         PedestrianCrossing that = (PedestrianCrossing) o;
 
-        if (!pt2.equals(that.pt2)) return false;
-        if (!pt1.equals(that.pt1)) return false;
+        // Convert to LatLng because LatLng defines the equality
+        // that we require
+        LatLng
+                t1 = LatLng.fromLocation(that.pt1),
+                t2 = LatLng.fromLocation(that.pt2),
 
-        return true;
+                p1 = LatLng.fromLocation(pt1),
+                p2 = LatLng.fromLocation(pt2);
+
+
+        // PedestrianCrossing's are defined by their location, we shouldn't
+        // need to check thoroughfare. The thoroughfares should be the same
+        //if (!thoroughfare.equals(that.thoroughfare)) return false;
+
+        // Both points must be the same, doesn't matter the ordering. It
+        // is like a set of two points.
+        return
+                (p2.equals(t2) && p1.equals(t1)) ||
+                        (p1.equals(t2) && p2.equals(t1));
     }
 
     @Override

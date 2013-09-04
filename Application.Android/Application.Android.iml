@@ -28,6 +28,7 @@
     <orderEntry type="library" name="org.antlr:antlr4-runtime:4.1" level="project" />
     <orderEntry type="library" name="google-play-services" level="project" />
     <orderEntry type="library" name="org.robolectric:robolectric:2.1.1" level="project" />
+    <orderEntry type="library" name="google-play-services" level="project" />
   </component>
 </module>
 

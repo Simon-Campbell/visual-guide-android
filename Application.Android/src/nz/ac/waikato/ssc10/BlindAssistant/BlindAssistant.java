@@ -18,9 +18,9 @@ import nz.ac.waikato.ssc10.input.BluetoothHeadsetHelper;
 import nz.ac.waikato.ssc10.input.VoiceMethod;
 import nz.ac.waikato.ssc10.input.VoiceMethodFactory;
 import nz.ac.waikato.ssc10.map.GoogleWalkingDirections;
-import nz.ac.waikato.ssc10.map.LatLng;
 import nz.ac.waikato.ssc10.map.NoSuchRouteException;
-import nz.ac.waikato.ssc10.map.WalkingDirections;
+import nz.ac.waikato.ssc10.map.geocode.CachedGeocoder;
+import nz.ac.waikato.ssc10.map.interfaces.WalkingDirections;
 import nz.ac.waikato.ssc10.navigation.CompassProvider;
 import nz.ac.waikato.ssc10.navigation.IncrementalNavigator;
 import nz.ac.waikato.ssc10.navigation.NavigationStep;
@@ -53,7 +53,7 @@ public class BlindAssistant implements NavigatorUpdateListener {
 
     private SensorManager sensorManager;
     private CompassProvider compassProvider;
-    private Geocoder geocoder;
+    private CachedGeocoder geocoder;
 
     private IncrementalNavigator navigator = null;
     private LocationClient locationClient = null;
@@ -63,7 +63,7 @@ public class BlindAssistant implements NavigatorUpdateListener {
     public BlindAssistant(Context context, BluetoothHeadsetHelper bluetoothHelper) {
         Log.d(TAG, "The blind assistant has been started");
 
-        this.geocoder = new Geocoder(context, Locale.getDefault());
+        this.geocoder = new CachedGeocoder(new Geocoder(context, Locale.getDefault()));
         this.bluetoothHelper = bluetoothHelper;
         this.context = context;
         this.voiceMethodFactory = VoiceMethodFactory.createStandardFactory();
@@ -77,7 +77,7 @@ public class BlindAssistant implements NavigatorUpdateListener {
         // Set up a location client, when it connects then we'll create a navigation
         // guide object
         this.locationClient = new LocationClient(context,
-                googlePlayerServicesConnectionCallbacks,
+                googlePlayServicesConnectionCallbacks,
                 googlePlayServicesOnConnectionFailedListener);
 
         // Start the connect process!
@@ -354,7 +354,7 @@ public class BlindAssistant implements NavigatorUpdateListener {
         }
     }
 
-    private GooglePlayServicesClient.ConnectionCallbacks googlePlayerServicesConnectionCallbacks = new GooglePlayServicesClient.ConnectionCallbacks() {
+    private GooglePlayServicesClient.ConnectionCallbacks googlePlayServicesConnectionCallbacks = new GooglePlayServicesClient.ConnectionCallbacks() {
         @Override
         public void onConnected(Bundle bundle) {
             say("the application has connected to the location service");

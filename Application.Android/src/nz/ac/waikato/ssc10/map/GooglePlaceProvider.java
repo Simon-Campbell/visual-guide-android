@@ -5,6 +5,7 @@ import android.location.Location;
 import android.util.Log;
 import com.google.gson.*;
 import com.google.gson.annotations.SerializedName;
+import nz.ac.waikato.ssc10.map.interfaces.PlaceProvider;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;

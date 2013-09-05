@@ -6,7 +6,7 @@ import android.location.Location;
 import android.os.*;
 import android.util.Log;
 import nz.ac.waikato.ssc10.map.NoSuchRouteException;
-import nz.ac.waikato.ssc10.map.WalkingDirections;
+import nz.ac.waikato.ssc10.map.interfaces.WalkingDirections;
 import nz.ac.waikato.ssc10.navigation.IncrementalNavigator;
 
 /**

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
@@ -18,9 +17,10 @@ import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import nz.ac.waikato.ssc10.BlindAssistant.services.WalkingDirectionsUpdateService;
-import nz.ac.waikato.ssc10.map.DisabilityWalkingDirections;
 import nz.ac.waikato.ssc10.map.NoSuchRouteException;
-import nz.ac.waikato.ssc10.map.WalkingDirections;
+import nz.ac.waikato.ssc10.map.geocode.CachedGeocoder;
+import nz.ac.waikato.ssc10.map.interfaces.ContextualWalkingDirections;
+import nz.ac.waikato.ssc10.map.interfaces.WalkingDirections;
 
 import java.io.IOException;
 import java.util.List;
@@ -84,12 +84,12 @@ public class IncrementalNavigator {
 
     private Context context;
     private LocationClient locationClient;
-    private Geocoder geocoder;
+    private CachedGeocoder geocoder;
     private LocationRequest locationRequest;
     private CompassProvider compassProvider;
 
     private WalkingDirections walkingDirections;
-    private DisabilityWalkingDirections disabilityWalkingDirections;
+    private ContextualWalkingDirections disabilityWalkingDirections;
 
     private LocationListener locationListener = new IncrementalNavigatorLocationListener();
     private ToneGenerator toneGenerator;
@@ -98,7 +98,7 @@ public class IncrementalNavigator {
         toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP);
     }
 
-    public IncrementalNavigator(Context context, LocationClient locationClient, CompassProvider compassProvider, Geocoder geocoder) {
+    public IncrementalNavigator(Context context, LocationClient locationClient, CompassProvider compassProvider, CachedGeocoder geocoder) {
         this.context = context;
         this.bindUpdateService(context);
 
@@ -260,6 +260,7 @@ public class IncrementalNavigator {
 
         /**
          * Detect a thoroughfare change based on the passed location
+         *
          * @param location The new location to compare to the previous
          *                 location and thus detect a street change.
          */
@@ -289,8 +290,7 @@ public class IncrementalNavigator {
             assert location != null;
             Address currentAddress = null;
 
-            try
-            {
+            try {
                 List<Address> results = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
 
                 if (results != null && results.size() != 0) {
@@ -310,6 +310,7 @@ public class IncrementalNavigator {
         /**
          * Checks if the update threshold for thoroughfare updates has passed. This is essential so that
          * the geolocation limit is not exceeded.
+         *
          * @return True if the threshold period has passed (do an update), false otherwise
          */
         private boolean hasThoroughfareUpdateThresholdPassed() {
@@ -359,7 +360,7 @@ public class IncrementalNavigator {
             final int Ddiff = 0;
             final double R = Math.PI;
 
-            double periodMilliseconds = (1000 * ((distance * (distance/R)) / Ca)) - Ddiff;
+            double periodMilliseconds = (1000 * ((distance * (distance / R)) / Ca)) - Ddiff;
 
             return (now - lastBeepTime) > periodMilliseconds;
         }

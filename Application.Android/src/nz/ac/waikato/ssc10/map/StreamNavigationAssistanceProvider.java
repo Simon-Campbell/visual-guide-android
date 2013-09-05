@@ -1,5 +1,6 @@
 package nz.ac.waikato.ssc10.map;
 
+import nz.ac.waikato.ssc10.map.interfaces.CullableStepProvider;
 import nz.ac.waikato.ssc10.navigation.NavigationStep;
 import nz.ac.waikato.ssc10.navigation.PedestrianCrossing;
 
@@ -10,7 +11,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StreamNavigationAssistanceProvider {
+public class StreamNavigationAssistanceProvider implements CullableStepProvider {
     public static final String PEDESTRIAN_CROSSING_TYPE = "PEDESTRIAN_CROSSING";
     public static final String COMMENT_TOKEN = ";";
 
@@ -45,6 +46,7 @@ public class StreamNavigationAssistanceProvider {
         }
     }
 
+    @Override
     public List<NavigationStep> getSteps() {
         return steps;
     }
@@ -57,6 +59,7 @@ public class StreamNavigationAssistanceProvider {
      * @param southEast The south east latitude boundary
      * @return A list of points within the boundaries
      */
+    @Override
     public List<NavigationStep> getSteps(LatLng northWest, LatLng southEast) {
         List<NavigationStep> view = new ArrayList<NavigationStep>(steps.size());
 

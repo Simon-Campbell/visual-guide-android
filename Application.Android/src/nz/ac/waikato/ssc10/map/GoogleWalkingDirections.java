@@ -2,6 +2,7 @@ package nz.ac.waikato.ssc10.map;
 
 import android.location.Address;
 import android.location.Location;
+import nz.ac.waikato.ssc10.map.interfaces.WalkingDirections;
 import nz.ac.waikato.ssc10.navigation.NavigationStep;
 import nz.ac.waikato.ssc10.navigation.WalkingNavigationStep;
 import org.apache.http.HttpResponse;

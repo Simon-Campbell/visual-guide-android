@@ -12,13 +12,13 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StreamNavigationAssistanceProvider implements CullableStepProvider {
+public class CsvNavigationStepProvider implements CullableStepProvider {
     public static final String PEDESTRIAN_CROSSING_TYPE = "PEDESTRIAN_CROSSING";
     public static final String COMMENT_TOKEN = ";";
 
     public List<NavigationStep> steps = new ArrayList<NavigationStep>();
 
-    public StreamNavigationAssistanceProvider(InputStream stream) throws IOException {
+    public CsvNavigationStepProvider(InputStream stream) throws IOException {
         BufferedReader br = null;
         String line = null;
 

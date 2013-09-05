@@ -13,13 +13,13 @@ import java.util.List;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
-public class StreamNavigationAssistanceProviderTest {
+public class CsvNavigationStepProviderTest {
     final String filePath = "test/resources/assist-locations.txt";
 
     @Test
     public void testGetSteps() throws Exception {
         final InputStream fileStream = new FileInputStream(filePath);
-        final StreamNavigationAssistanceProvider assistanceProvider = new StreamNavigationAssistanceProvider(fileStream);
+        final CsvNavigationStepProvider assistanceProvider = new CsvNavigationStepProvider(fileStream);
         final List<NavigationStep> steps = assistanceProvider.getSteps();
 
         assertTrue("steps cannot be null", steps != null);
@@ -39,7 +39,7 @@ public class StreamNavigationAssistanceProviderTest {
         final InputStream fileStream = new FileInputStream(filePath);
         final LatLng northEast = new LatLng(-37.79, 176.0);
         final LatLng southWest = new LatLng(-38.0, 175.0);
-        final StreamNavigationAssistanceProvider assistanceProvider = new StreamNavigationAssistanceProvider(fileStream);
+        final CsvNavigationStepProvider assistanceProvider = new CsvNavigationStepProvider(fileStream);
         final List<NavigationStep> steps = assistanceProvider.getSteps(northEast, southWest);
 
         assertTrue("steps cannot be null", steps != null);

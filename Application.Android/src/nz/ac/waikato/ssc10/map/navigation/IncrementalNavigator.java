@@ -17,7 +17,7 @@ import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import nz.ac.waikato.ssc10.BlindAssistant.services.WalkingDirectionsUpdateService;
-import nz.ac.waikato.ssc10.map.DisabilityWalkingDirections;
+import nz.ac.waikato.ssc10.map.CompassProvider;
 import nz.ac.waikato.ssc10.map.NoSuchRouteException;
 import nz.ac.waikato.ssc10.map.geocode.CachedGeocoder;
 import nz.ac.waikato.ssc10.map.interfaces.ContextualWalkingDirections;

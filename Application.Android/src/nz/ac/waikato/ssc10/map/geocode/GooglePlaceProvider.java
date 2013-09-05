@@ -1,4 +1,4 @@
-package nz.ac.waikato.ssc10.map;
+package nz.ac.waikato.ssc10.map.geocode;
 
 import android.location.Address;
 import android.location.Location;

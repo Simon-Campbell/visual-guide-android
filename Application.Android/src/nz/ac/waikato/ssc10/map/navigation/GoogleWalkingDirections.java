@@ -1,10 +1,11 @@
-package nz.ac.waikato.ssc10.map;
+package nz.ac.waikato.ssc10.map.navigation;
 
 import android.location.Address;
 import android.location.Location;
+import nz.ac.waikato.ssc10.map.LatLng;
+import nz.ac.waikato.ssc10.map.NoSuchRouteException;
+import nz.ac.waikato.ssc10.map.geocode.GooglePlaceProvider;
 import nz.ac.waikato.ssc10.map.interfaces.WalkingDirections;
-import nz.ac.waikato.ssc10.map.navigation.NavigationStep;
-import nz.ac.waikato.ssc10.map.navigation.WalkingNavigationStep;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -40,7 +41,8 @@ public class GoogleWalkingDirections implements WalkingDirections {
     /**
      * @param startLocation
      * @param endpointName
-     * @throws NoSuchRouteException
+     * @throws nz.ac.waikato.ssc10.map.NoSuchRouteException
+     *
      */
     public GoogleWalkingDirections(Location startLocation, String endpointName) throws NoSuchRouteException {
         GooglePlaceProvider placeProvider = new GooglePlaceProvider();

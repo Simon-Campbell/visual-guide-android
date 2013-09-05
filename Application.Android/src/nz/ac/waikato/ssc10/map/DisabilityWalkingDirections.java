@@ -1,10 +1,12 @@
 package nz.ac.waikato.ssc10.map;
 
 import android.location.Location;
+import nz.ac.waikato.ssc10.map.geocode.CachedGeocoder;
 import nz.ac.waikato.ssc10.map.interfaces.ContextualWalkingDirections;
 import nz.ac.waikato.ssc10.map.interfaces.WalkingDirections;
-import nz.ac.waikato.ssc10.navigation.NavigationStep;
-import nz.ac.waikato.ssc10.navigation.PedestrianCrossing;
+import nz.ac.waikato.ssc10.map.navigation.NavigationStep;
+import nz.ac.waikato.ssc10.map.navigation.PedestrianCrossing;
+import nz.ac.waikato.ssc10.util.MapUtil;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -18,14 +20,31 @@ import java.util.Queue;
 public class DisabilityWalkingDirections extends WalkingDirectionsDecorator implements ContextualWalkingDirections {
     private static int MAX_QUEUE_SIZE = 16;
 
+    private CachedGeocoder geocoder;
     private Queue<Location> locations;
+    private List<NavigationStep> disabilitySteps;
     private Location location;
 
-    public DisabilityWalkingDirections(WalkingDirections directions) {
+    private void constructFrom(GoogleWalkingDirections directions) {
+        Location northEast = directions.getNorthEastBound().toLocation();
+        Location southWest = directions.getSouthWestBound().toLocation();
+
+        this.disabilitySteps = MapUtil.areaFilter(getAidPoints(), northEast, southWest);
+    }
+
+    public DisabilityWalkingDirections(WalkingDirections directions, CachedGeocoder geocoder) {
         super(directions);
 
-        location = null;
-        locations = new ArrayDeque<Location>(MAX_QUEUE_SIZE);
+        this.geocoder = geocoder;
+
+        this.location = null;
+        this.locations = new ArrayDeque<Location>(MAX_QUEUE_SIZE);
+
+        if (directions instanceof GoogleWalkingDirections) {
+            constructFrom((GoogleWalkingDirections) directions);
+        } else {
+            this.disabilitySteps = getAidPoints();
+        }
     }
 
     /**
@@ -51,7 +70,7 @@ public class DisabilityWalkingDirections extends WalkingDirectionsDecorator impl
         List<NavigationStep> steps;
 
         if (location != null) {
-            steps = decorateSteps(super.getSteps(), getAidPoints());
+            steps = decorateSteps(super.getSteps(), disabilitySteps);
         } else {
             steps = super.getSteps();
         }
@@ -60,8 +79,13 @@ public class DisabilityWalkingDirections extends WalkingDirectionsDecorator impl
     }
 
     @Override
+    public NavigationStep getStep(int step) {
+        return super.getStep(step);
+    }
+
+    @Override
     public WalkingDirections routeFrom(Location location) throws NoSuchRouteException {
-        return new DisabilityWalkingDirections(super.routeFrom(location));
+        return new DisabilityWalkingDirections(super.routeFrom(location), geocoder);
     }
 
     private static List<NavigationStep> getAidPoints() {

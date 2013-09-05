@@ -3,8 +3,8 @@ package nz.ac.waikato.ssc10.map;
 import android.location.Address;
 import android.location.Location;
 import nz.ac.waikato.ssc10.map.interfaces.WalkingDirections;
-import nz.ac.waikato.ssc10.navigation.NavigationStep;
-import nz.ac.waikato.ssc10.navigation.WalkingNavigationStep;
+import nz.ac.waikato.ssc10.map.navigation.NavigationStep;
+import nz.ac.waikato.ssc10.map.navigation.WalkingNavigationStep;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -138,6 +138,14 @@ public class GoogleWalkingDirections implements WalkingDirections {
         }
     }
 
+    public LatLng getNorthEastBound() {
+        return northEastBound;
+    }
+
+    public LatLng getSouthWestBound() {
+        return southWestBound;
+    }
+
     private LatLng northEastBound;
     private LatLng southWestBound;
     private int distanceValue;
@@ -149,8 +157,13 @@ public class GoogleWalkingDirections implements WalkingDirections {
     private ArrayList<NavigationStep> steps = new ArrayList<NavigationStep>();
     private String copyright = "Map data (c)2013 Google";
 
+
     public List<NavigationStep> getSteps() {
         return steps;
+    }
+
+    public NavigationStep getStep(int step) {
+        return steps.get(step);
     }
 
     private void setFromJson(String json) throws

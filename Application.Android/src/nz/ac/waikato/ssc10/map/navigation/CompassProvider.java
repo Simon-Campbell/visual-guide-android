@@ -1,4 +1,4 @@
-package nz.ac.waikato.ssc10.navigation;
+package nz.ac.waikato.ssc10.map.navigation;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;

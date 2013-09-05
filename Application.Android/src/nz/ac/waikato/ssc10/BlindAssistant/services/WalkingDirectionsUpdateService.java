@@ -7,7 +7,7 @@ import android.os.*;
 import android.util.Log;
 import nz.ac.waikato.ssc10.map.NoSuchRouteException;
 import nz.ac.waikato.ssc10.map.interfaces.WalkingDirections;
-import nz.ac.waikato.ssc10.navigation.IncrementalNavigator;
+import nz.ac.waikato.ssc10.map.navigation.IncrementalNavigator;
 
 /**
  * Created with IntelliJ IDEA.

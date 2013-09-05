@@ -1,4 +1,4 @@
-package nz.ac.waikato.ssc10.navigation;
+package nz.ac.waikato.ssc10.map.navigation;
 
 import android.location.Location;
 import nz.ac.waikato.ssc10.map.LatLng;
@@ -62,16 +62,6 @@ public class PedestrianCrossing implements NavigationStep {
     @Override
     public String getInstruction() {
         return "walk across the pedestrian crossing";
-    }
-
-    @Override
-    public NavigationStep getNext() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    @Override
-    public NavigationStep getPrevious() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override

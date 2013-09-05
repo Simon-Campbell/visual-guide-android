@@ -21,10 +21,10 @@ import nz.ac.waikato.ssc10.map.GoogleWalkingDirections;
 import nz.ac.waikato.ssc10.map.NoSuchRouteException;
 import nz.ac.waikato.ssc10.map.geocode.CachedGeocoder;
 import nz.ac.waikato.ssc10.map.interfaces.WalkingDirections;
-import nz.ac.waikato.ssc10.navigation.CompassProvider;
-import nz.ac.waikato.ssc10.navigation.IncrementalNavigator;
-import nz.ac.waikato.ssc10.navigation.NavigationStep;
-import nz.ac.waikato.ssc10.navigation.NavigatorUpdateListener;
+import nz.ac.waikato.ssc10.map.navigation.CompassProvider;
+import nz.ac.waikato.ssc10.map.navigation.IncrementalNavigator;
+import nz.ac.waikato.ssc10.map.navigation.NavigationStep;
+import nz.ac.waikato.ssc10.map.navigation.NavigatorUpdateListener;
 import org.javatuples.Pair;
 
 import java.io.IOException;

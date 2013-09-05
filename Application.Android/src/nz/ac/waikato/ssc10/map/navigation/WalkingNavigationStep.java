@@ -1,4 +1,4 @@
-package nz.ac.waikato.ssc10.navigation;
+package nz.ac.waikato.ssc10.map.navigation;
 
 import android.location.Location;
 import nz.ac.waikato.ssc10.map.LatLng;
@@ -31,7 +31,7 @@ public class WalkingNavigationStep implements NavigationStep {
 
     @Override
     public String getInstruction() {
-        return (instruction.replaceAll("\\<.*?>",""));
+        return (instruction.replaceAll("\\<.*?>", ""));
     }
 
     public void setNext(NavigationStep next) {
@@ -40,16 +40,6 @@ public class WalkingNavigationStep implements NavigationStep {
 
     public void setPrevious(NavigationStep previous) {
         this.previous = previous;
-    }
-
-    @Override
-    public NavigationStep getNext() {
-        return this.next;
-    }
-
-    @Override
-    public NavigationStep getPrevious() {
-        return this.previous;
     }
 
     @Override

@@ -1,7 +1,7 @@
 package nz.ac.waikato.ssc10.map;
 
-import nz.ac.waikato.ssc10.navigation.NavigationStep;
-import nz.ac.waikato.ssc10.navigation.PedestrianCrossing;
+import nz.ac.waikato.ssc10.map.navigation.NavigationStep;
+import nz.ac.waikato.ssc10.map.navigation.PedestrianCrossing;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
@@ -37,10 +37,10 @@ public class StreamNavigationAssistanceProviderTest {
                    -lat
         */
         final InputStream fileStream = new FileInputStream(filePath);
-        final LatLng northWest = new LatLng(-37.79, 175.0);
-        final LatLng southEast = new LatLng(-38.0, 176.0);
+        final LatLng northEast = new LatLng(-37.79, 176.0);
+        final LatLng southWest = new LatLng(-38.0, 175.0);
         final StreamNavigationAssistanceProvider assistanceProvider = new StreamNavigationAssistanceProvider(fileStream);
-        final List<NavigationStep> steps = assistanceProvider.getSteps(northWest, southEast);
+        final List<NavigationStep> steps = assistanceProvider.getSteps(northEast, southWest);
 
         assertTrue("steps cannot be null", steps != null);
         assertTrue("steps should be size 1", steps.size() == 1);

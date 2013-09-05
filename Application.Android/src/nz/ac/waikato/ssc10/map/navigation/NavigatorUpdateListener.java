@@ -1,4 +1,4 @@
-package nz.ac.waikato.ssc10.navigation;
+package nz.ac.waikato.ssc10.map.navigation;
 
 import java.util.List;
 

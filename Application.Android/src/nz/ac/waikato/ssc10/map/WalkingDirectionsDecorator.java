@@ -2,7 +2,7 @@ package nz.ac.waikato.ssc10.map;
 
 import android.location.Location;
 import nz.ac.waikato.ssc10.map.interfaces.WalkingDirections;
-import nz.ac.waikato.ssc10.navigation.NavigationStep;
+import nz.ac.waikato.ssc10.map.navigation.NavigationStep;
 
 import java.util.List;
 
@@ -20,6 +20,10 @@ public abstract class WalkingDirectionsDecorator implements WalkingDirections {
     @Override
     public List<NavigationStep> getSteps() {
         return directions.getSteps();
+    }
+
+    public NavigationStep getStep(int step) {
+        return directions.getStep(step);
     }
 
     @Override

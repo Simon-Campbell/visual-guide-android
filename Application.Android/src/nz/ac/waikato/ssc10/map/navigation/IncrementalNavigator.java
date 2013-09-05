@@ -1,4 +1,4 @@
-package nz.ac.waikato.ssc10.navigation;
+package nz.ac.waikato.ssc10.map.navigation;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -17,6 +17,7 @@ import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import nz.ac.waikato.ssc10.BlindAssistant.services.WalkingDirectionsUpdateService;
+import nz.ac.waikato.ssc10.map.DisabilityWalkingDirections;
 import nz.ac.waikato.ssc10.map.NoSuchRouteException;
 import nz.ac.waikato.ssc10.map.geocode.CachedGeocoder;
 import nz.ac.waikato.ssc10.map.interfaces.ContextualWalkingDirections;
@@ -67,7 +68,6 @@ public class IncrementalNavigator {
                     }
 
                     break;
-
                 case WalkingDirectionsUpdateService.RESULT_NO_ROUTE:
                     Log.w(TAG, "A route was unable to be automatically generated");
                     break;
@@ -88,8 +88,7 @@ public class IncrementalNavigator {
     private LocationRequest locationRequest;
     private CompassProvider compassProvider;
 
-    private WalkingDirections walkingDirections;
-    private ContextualWalkingDirections disabilityWalkingDirections;
+    private ContextualWalkingDirections walkingDirections;
 
     private LocationListener locationListener = new IncrementalNavigatorLocationListener();
     private ToneGenerator toneGenerator;
@@ -174,7 +173,7 @@ public class IncrementalNavigator {
         // The method assumes that by setting the walking directions object you are
         // starting from the beginning.
         this.currentIdx = 0;
-        this.walkingDirections = walkingDirections;
+        this.walkingDirections = new DisabilityWalkingDirections(walkingDirections, geocoder);
 
         if (walkingDirections != null) {
             if (navigatorUpdateListener != null) {
@@ -380,6 +379,12 @@ public class IncrementalNavigator {
             detectThoroughfareChange(location);
 
             if (navigatorUpdateListener != null && walkingDirections != null) {
+                // Tell the walking directions object about the current
+                // context
+                walkingDirections.tell(location);
+
+                // After the context has changed we'll need to
+                // get the current step
                 NavigationStep current = getCurrentStep();
 
                 if (current != null) {

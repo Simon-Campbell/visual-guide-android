@@ -342,9 +342,17 @@ public class BlindAssistant implements NavigatorUpdateListener {
     }
 
     public void shutdown() {
-        tts.shutdown();
-        navigator.shutdown();
-        compassProvider.shutdown();
+        if (tts != null) {
+            tts.shutdown();
+        }
+
+        if (navigator != null) {
+            navigator.shutdown();
+        }
+
+        if (compassProvider != null) {
+            compassProvider.shutdown();
+        }
     }
 
     private class TextToSpeechInitListener implements TextToSpeech.OnInitListener {

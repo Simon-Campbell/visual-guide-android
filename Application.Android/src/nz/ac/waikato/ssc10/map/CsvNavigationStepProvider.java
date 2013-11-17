@@ -14,6 +14,8 @@ import java.util.List;
 
 public class CsvNavigationStepProvider implements CullableStepProvider {
     public static final String PEDESTRIAN_CROSSING_TYPE = "PEDESTRIAN_CROSSING";
+    public static final String ISLAND_CROSSING_TYPE = "ISLAND_CROSSING";
+
     public static final String COMMENT_TOKEN = ";";
 
     public List<NavigationStep> steps = new ArrayList<NavigationStep>();

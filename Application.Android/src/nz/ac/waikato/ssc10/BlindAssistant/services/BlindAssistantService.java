@@ -1,11 +1,9 @@
 package nz.ac.waikato.ssc10.BlindAssistant.services;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.media.AudioManager;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -125,7 +123,7 @@ public class BlindAssistantService extends Service {
         // The PendingIntent to launch our activity if the user selects this notification
         PendingIntent contentIntent =
                 PendingIntent.getActivity(this, 0,
-                                new Intent(this, VoicePromptActivity.class), PendingIntent.FLAG_ONE_SHOT);
+                        new Intent(this, VoicePromptActivity.class), PendingIntent.FLAG_ONE_SHOT);
 
         // Set the icon, scrolling text and timestamp
         Notification notification = new Notification.Builder(this)
@@ -145,7 +143,7 @@ public class BlindAssistantService extends Service {
     }
 
     private void sayStatus(SpeechRecognizerUtil.VoiceStatus status, Object parameter) {
-        switch (status) {
+        switch (SpeechRecognizerUtil.VoiceStatus.ERROR) {
             case ERROR:
                 int err = ((Integer) parameter).intValue();
                 String errorDescription = SpeechRecognizerUtil.describeError(this, err);

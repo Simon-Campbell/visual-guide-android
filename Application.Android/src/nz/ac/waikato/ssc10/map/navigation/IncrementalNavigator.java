@@ -55,6 +55,9 @@ public class IncrementalNavigator {
     private float headingBearing;
     private float facingBearing;
 
+    // The time in ms when the beeper last beeped!
+    private long lastBeepTime = 0;
+
     private static final String TAG = "IncrementalNavigator";
     private final Handler directionsUpdateHandler = new Handler() {
         @Override
@@ -173,6 +176,7 @@ public class IncrementalNavigator {
         // The method assumes that by setting the walking directions object you are
         // starting from the beginning.
         this.currentIdx = 0;
+        this.lastBeepTime = System.currentTimeMillis();
         this.walkingDirections = new DisabilityWalkingDirections(walkingDirections, geocoder);
 
         if (walkingDirections != null) {
@@ -252,7 +256,6 @@ public class IncrementalNavigator {
         private Address lastGeocodeAddress = null;
 
         private long lastGeocodeUpdate = 0;
-        private long lastBeepTime = 0;
 
         private static final double MOVE_DISTANCE_THRESH = 2.5;
         private static final double UPDATE_DISTANCE_THRESH = 10.0;
@@ -416,9 +419,8 @@ public class IncrementalNavigator {
             // user is walking away from the next point by doing
             // a distance check
             NavigationStep current = getCurrentStep();
-            NavigationStep next = getNextStep();
 
-            if (current != null && next != null) {
+            if (current != null) {
                 float diff = getDistanceTo(anchorLocation, current.getEndLocation()) - distanceTo;
 
                 if (diff > MOVE_DISTANCE_THRESH) {
